@@ -1,4 +1,14 @@
-import Timer from "/js/Timer.js";
+const INPUT_MAP = {
+    "ArrowUp": "up",
+    "ArrowDown": "down",
+    "ArrowLeft": "left",
+    "ArrowRight": "right",
+    "Space": "jump",
+    "KeyC": "jump",
+};
+
+// the amount of time per engine tick
+const TICK_TIME = 1 / 60;
 
 // This game shell was happily modified from Googler Seth Ladd's "Bad Aliens" game and his Google IO talk in 2011
 export default class GameEngine {
@@ -14,7 +24,7 @@ export default class GameEngine {
         this.click = null;
         this.mouse = null;
         this.wheel = null;
-        this.keys = {};
+        this.input = Object.create(null);
 
         // Options and the Details
         this.options = options || {
@@ -22,19 +32,22 @@ export default class GameEngine {
         };
     };
 
+    /** @param {CanvasRenderingContext2D} ctx */
     init(ctx) {
         this.ctx = ctx;
+        ctx.font = "12px monospace";
         this.startInput();
-        this.timer = new Timer();
+        this.timeAccumulator = 0;
+        this.lastTimestamp = 0;
     };
 
     start() {
         this.running = true;
-        const gameLoop = () => {
-            this.loop();
-            window.requestAnimationFrame(gameLoop, this.ctx.canvas);
+        const gameLoop = now => {
+            this.loop(now);
+            window.requestAnimationFrame(gameLoop);
         };
-        gameLoop();
+        window.requestAnimationFrame(gameLoop);
     };
 
     startInput() {
@@ -42,7 +55,7 @@ export default class GameEngine {
             x: e.clientX - this.ctx.canvas.getBoundingClientRect().left,
             y: e.clientY - this.ctx.canvas.getBoundingClientRect().top
         });
-        
+
         this.ctx.canvas.addEventListener("mousemove", e => {
             if (this.options.debugging) {
                 console.log("MOUSE_MOVE", getXandY(e));
@@ -61,7 +74,7 @@ export default class GameEngine {
             if (this.options.debugging) {
                 console.log("WHEEL", getXandY(e), e.wheelDelta);
             }
-            e.preventDefault(); // Prevent Scrolling
+            // e.preventDefault(); // Prevent Scrolling
             this.wheel = e;
         });
 
@@ -73,21 +86,34 @@ export default class GameEngine {
             this.rightclick = getXandY(e);
         });
 
-        this.ctx.canvas.addEventListener("keydown", event => this.keys[event.key] = true);
-        this.ctx.canvas.addEventListener("keyup", event => this.keys[event.key] = false);
+        this.ctx.canvas.addEventListener("keydown", event => {
+            this.input[INPUT_MAP[event.code]] = true;
+        });
+        this.ctx.canvas.addEventListener("keyup", event => {
+            this.input[INPUT_MAP[event.code]] = false;
+        });
     };
 
     addEntity(entity) {
         this.entities.push(entity);
     };
 
+    // the Level is a special entity that many other entities will need to access directly
+    /** @param {import('/js/Level.js').default} level */
+    setLevel(level) {
+        this.entities.push(level);
+        this.level = level;
+    }
+    getLevel() {
+        return this.level;
+    }
+
     draw() {
         // Clear the whole canvas with transparent color (rgba(0, 0, 0, 0))
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 
-        // Draw latest things first
-        for (let i = this.entities.length - 1; i >= 0; i--) {
-            this.entities[i].draw(this.ctx, this);
+        for (const entity of this.entities) {
+            entity.draw(this.ctx, this);
         }
     };
 
@@ -98,7 +124,7 @@ export default class GameEngine {
             let entity = this.entities[i];
 
             if (!entity.removeFromWorld) {
-                entity.update();
+                entity.update(this);
             }
         }
 
@@ -109,12 +135,23 @@ export default class GameEngine {
         }
     };
 
-    loop() {
-        this.clockTick = this.timer.tick();
-        this.update();
-        this.draw();
-    };
+    loop(now) {
+        const deltaTime = (now - this.lastTimestamp) / 1000; // delta time in seconds
+        this.lastTimestamp = now;
 
-};
+        // use a fixed timestep to behave identically at different refresh rates
+        this.timeAccumulator += deltaTime;
+        if (this.timeAccumulator > TICK_TIME) {
+            this.update();
+            this.timeAccumulator -= TICK_TIME;
+        }
+        if (this.timeAccumulator > TICK_TIME * 5) {  // remove extra steps worth of time that could not be processed
+            console.warn(`update took too long! behind by ${Math.floor(this.timeAccumulator / TICK_TIME)}ms`);
+            this.timeAccumulator = this.timeAccumulator % TICK_TIME;
+        }
 
-// KV Le was here :)
+        this.draw(deltaTime);
+        this.ctx.fillStyle = "black"
+        this.ctx.fillText(`fps: ${(1 / deltaTime).toFixed(2)}`, 0, 12);
+    }
+}
