@@ -1,9 +1,15 @@
 const INPUT_MAP = {
+    "KeyW": "up",
+    "KeyA": "left",
+    "KeyS": "down",
+    "KeyD": "right",
+    "Space": "jump",
+    "KeyE": "interact",
+    // alternate platformer style controls (like hollow knight, celeste, etc. can change if necessary)
     "ArrowUp": "up",
     "ArrowDown": "down",
     "ArrowLeft": "left",
     "ArrowRight": "right",
-    "Space": "jump",
     "KeyC": "jump",
 };
 
