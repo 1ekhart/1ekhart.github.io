@@ -160,4 +160,8 @@ export default class GameEngine {
         this.ctx.fillStyle = "black"
         this.ctx.fillText(`fps: ${(1 / deltaTime).toFixed(2)}`, 0, 12);
     }
+
+    getTickSpeed() {
+        return TICK_TIME;
+    }
 }

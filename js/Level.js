@@ -1,6 +1,8 @@
 // TODO: better map editing
 // TODO: ability to swap out different maps
 
+import Interactable from './Interactable.js';
+
 // size of a tile in screen pixels
 const TILE_SIZE = 32;
 
@@ -11,8 +13,21 @@ const tileColors = [
 ];
 
 export default class Level {
-    constructor(tileData) {
+    constructor(tileData, engine) {
         this.data = tileData;
+        // cycle through the tile data to pick which ones are entities to add to the level
+
+        for (let row = 0; row < this.data.length; row++) {
+            const rowData = this.data[row];
+            const rowDataLength = rowData.length;
+
+            for (let column = 0; column < rowDataLength; column++) {
+                const tile = rowData[column];
+                if (tile == 3) {
+                    engine.addEntity(new Interactable(column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE));
+                }
+            }
+        }
     }
 
     update() {
@@ -33,7 +48,7 @@ export default class Level {
         // check all tiles that the box overlaps
         for(let x = left; x <= right; x++) {
             for(let y = top; y <= bottom; y++) {
-                if(this.getTile(x, y) !== 0) {
+                if(this.getTile(x, y) !== 0 && this.getTile(x, y) < 3) {
                     return true;
                 }
             }
@@ -55,7 +70,7 @@ export default class Level {
 
             for (let column = 0; column < rowDataLength; column++) {
                 const tile = rowData[column];
-                if (tile > 0) {
+                if (tile > 0 && tile < 3) {
                     // temporary box graphics for tiles
                     ctx.fillStyle = tileColors[tile];
                     ctx.fillRect(column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
