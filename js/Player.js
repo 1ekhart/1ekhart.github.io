@@ -1,4 +1,6 @@
-import Entity from "/js/Entity.js";
+import Entity from "./AbstractClasses/Entity.js";
+import BoundingBox from "./GeneralUtils/BoundingBox.js";
+import Interactable from "./Interactable.js";
 const floor = Math.floor;
 
 const HITBOX_WIDTH = 24;
@@ -15,6 +17,11 @@ export default class Player extends Entity {
         this.xVelocity = 0;
         this.yVelocity = 0;
         this.onGround = false;
+        this.BB = new BoundingBox()
+    }
+
+    updateBB() {
+        this.BB = new BoundingBox(this.x, this.y, HITBOX_WIDTH, HITBOX_HEIGHT);
     }
 
     /**
@@ -34,6 +41,10 @@ export default class Player extends Entity {
         }
         if (this.onGround && engine.input.jump) {
             this.yVelocity = -11; // jump strength
+        }
+
+        if (engine.input.interact) {
+            this.handleIteraction(engine);
         }
 
         // gravity
@@ -64,6 +75,15 @@ export default class Player extends Entity {
             this.yVelocity += 1;
         }
         this.y += this.yVelocity;
+        this.updateBB();
+    }
+
+    handleIteraction(engine) {
+        engine.entities.forEach(function (entity) {
+            if (entity instanceof Interactable) {
+                entity.handleInteraction();
+            }
+        })
     }
 
     /**
