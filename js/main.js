@@ -14,19 +14,6 @@ const ASSET_MANAGER = new AssetManager();
 ASSET_MANAGER.queueDownload("/Assets/Player/IdleRun-Sheet.png")
 
 
-const tileData = [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 1, 1, 0, 0, 0, 1],
-    [1, 1, 1, 1, 2, 1, 0, 0, 0],
-    [2, 2, 2, 2, 2, 2, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 1, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [2, 2, 2, 2, 2, 2, 2, 2, 2]
-];
-
 ASSET_MANAGER.downloadAll(() => {
     const canvas = document.getElementById("gameWorld");
     const ctx = canvas.getContext("2d");
@@ -36,8 +23,8 @@ ASSET_MANAGER.downloadAll(() => {
 
     // TODO: once the UI is implemented, the main menu or some manager class should be the first entity added
     // it will then spawn all the other entities as necessary
-    gameEngine.setLevel(new Level(tileData));
-    gameEngine.addEntity(new Player(48, 32));
+    gameEngine.setLevel(new Level());
+    gameEngine.setPlayer(new Player(48, 32));
     gameEngine.addEntity(new InGameClock());
     gameEngine.addEntity(new CollisionTester());
     gameEngine.addEntity(new CropEntity(2 * 32, 8 * 32));

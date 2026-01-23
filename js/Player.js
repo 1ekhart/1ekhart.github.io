@@ -117,6 +117,8 @@ export default class Player extends WorldEntity {
             this.yVelocity += 1;
         }
         this.y += this.yVelocity;
+
+        // this.y = 240;
     }
 
     /**

@@ -1,7 +1,10 @@
 /** @import GameEngine from "/js/GameEngine.js" */
+import Interactable from './Interactable.js';
 
 // size of a tile in screen pixels
 const TILE_SIZE = 32;
+//For some reason the player's Y coordinate is always (n block + 0.46875) * 32
+const Y_FIX = 0.46875;
 
 const tileColors = [
     "#000000",
@@ -9,13 +12,80 @@ const tileColors = [
     "#444444"
 ];
 
-export default class Level {
-    constructor(tileData) {
-        this.data = tileData;
+
+const tileData1 = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 1, 0, 0, 0, 1],
+    [1, 1, 1, 1, 2, 1, 0, 0, 0],
+    [2, 2, 2, 2, 2, 2, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 1, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [2, 2, 2, 2, 2, 2, 2, 2, 2]
+];
+
+const tileData2 = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 1, 0, 0, 0, 1],
+    [1, 1, 1, 1, 2, 1, 0, 0, 0],
+    [2, 2, 2, 2, 2, 2, 2, 2, 2],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [2, 2, 2, 2, 2, 2, 2, 2, 2]
+];
+
+const tileData3 = [
+    [2, 2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 0, 0, 0, 0, 0, 0, 0, 2],
+    [2, 0, 0, 0, 0, 0, 0, 0, 2],
+    [2, 0, 0, 0, 0, 0, 0, 0, 2],
+    [2, 0, 0, 0, 0, 0, 0, 0, 2],
+    [2, 0, 0, 0, 2, 2, 2, 2, 2],
+    [2, 0, 0, 2, 0, 0, 0, 0, 0],
+    [2, 0, 0, 0, 0, 0, 0, 0, 0],
+    [2, 0, 0, 0, 0, 0, 0, 0, 0],
+    [2, 2, 2, 2, 2, 2, 2, 2, 2]
+];
+
+export default class LevelManager {
+    constructor() {
+        this.toggleCooldown = 1;
+        this.elapsedTime = 0;
+        this.data = tileData1;
     }
 
-    update() {
-
+    //Handling level transitions and player movement
+    update(engine) {
+        const player = engine.getPlayer();
+        if (player.x < -0.25 * TILE_SIZE && Math.floor(player.y) >= 7 * TILE_SIZE && Math.floor(player.y) < 8 * TILE_SIZE && this.data === tileData1) {
+            console.log("1 to 2")
+            this.data = tileData2;
+            player.x = 8 * TILE_SIZE ;
+            player.y = (7 + Y_FIX) * TILE_SIZE - 1;
+        }
+        if (player.x > 8.25 * TILE_SIZE && Math.floor(player.y) >= 7 * TILE_SIZE && Math.floor(player.y) < 8 * TILE_SIZE && this.data === tileData2) {
+            console.log("2 to 1")
+            this.data = tileData1;
+            player.x = 0 * TILE_SIZE;
+            player.y = (7 + Y_FIX) * TILE_SIZE - 1;
+        }
+        if (player.x < -0.25 * TILE_SIZE && Math.floor(player.y) >= 7 * TILE_SIZE && Math.floor(player.y) < 8 * TILE_SIZE && this.data === tileData2) {
+            console.log("2 to 3")
+            this.data = tileData3;
+            player.x = 8 * TILE_SIZE;
+            player.y = (7 + Y_FIX) * TILE_SIZE - 1;
+        }
+        if (player.x > 8 * TILE_SIZE && Math.floor(player.y) >= 7 * TILE_SIZE && Math.floor(player.y) < 8 * TILE_SIZE && this.data === tileData3) {
+            console.log("3 to 2")
+            this.data = tileData2;
+            player.x = 0 * TILE_SIZE;
+            player.y = (7 + Y_FIX) * TILE_SIZE - 1;
+        }
     }
 
     getTile(tileX, tileY) {

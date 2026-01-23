@@ -1,5 +1,6 @@
-/** @import Level from "/js/Level.js" */
 /** @import Entity from "/js/Entity.js" */
+/** @import Level from "/js/Level.js" */
+/** @import Player from "/js/Player.js" */
 
 import { CONSTANTS } from "/js/Util.js";
 
@@ -112,11 +113,21 @@ export default class GameEngine {
     // the Level is a special entity that many other entities will need to access directly
     /** @param {Level} level */
     setLevel(level) {
-        this.entities.push(level);
+        this.addEntity(level);
         this.level = level;
     }
     getLevel() {
         return this.level;
+    }
+
+    // same w/ the player
+    /** @param {Player} player */
+    setPlayer(player) {
+        this.addEntity(player);
+        this.player = player;
+    }
+    getPlayer() {
+        return this.player
     }
 
     draw() {
