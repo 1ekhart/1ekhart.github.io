@@ -9,6 +9,9 @@ const gameEngine = new GameEngine();
 
 const ASSET_MANAGER = new AssetManager();
 
+ASSET_MANAGER.queueDownload("./js/Assets/Player/IdleRun-Sheet.png")
+
+
 const tileData = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -25,7 +28,7 @@ const tileData = [
 ASSET_MANAGER.downloadAll(() => {
     const canvas = document.getElementById("gameWorld");
     const ctx = canvas.getContext("2d");
-
+	ctx.imageSmoothingEnabled = false;
     gameEngine.init(ctx);
 
     // TODO: once the UI is implemented, the main menu or some manager class should be the first entity added

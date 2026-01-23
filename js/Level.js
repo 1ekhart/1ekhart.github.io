@@ -24,7 +24,7 @@ export default class Level {
             for (let column = 0; column < rowDataLength; column++) {
                 const tile = rowData[column];
                 if (tile == 3) {
-                    engine.addEntity(new Interactable(column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE));
+                    engine.addEntity(new Interactable(column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE, engine));
                 }
             }
         }

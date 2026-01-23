@@ -1,3 +1,10 @@
+//Global Constants
+export const PARAMS = {
+    DEBUG: true,
+    SCALE: 2,
+    BITWIDTH: 16
+};
+
 /**
  * @param {Number} n
  * @returns Random Integer Between 0 and n-1

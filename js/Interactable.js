@@ -1,8 +1,11 @@
 import EntityInteractable from './AbstractClasses/EntityInteractable.js';
 import BoundingBox from './GeneralUtils/BoundingBox.js';
+import OnScreenTextSystem from '/js/GeneralUtils/OnScreenText.js';
+import Player from '/js/Player.js';
+import Item from '/js/AbstractClasses/Item.js';
 
 export default class Interactable extends EntityInteractable {
-    constructor(x, y, width, height) {
+    constructor(x, y, width, height, engine) {
         super();
         Object.assign(this, {x, y, width, height})
         this.x = x;
@@ -14,16 +17,33 @@ export default class Interactable extends EntityInteractable {
         this.updateBB();
         this.toggleCooldown = 1; // 1 second cooldown
         this.elapsedTime = 0;
+        this.engine = engine;
 
         this.toggleable = true;
 
         this.toggleState = false;
+        this.prompt = new OnScreenTextSystem(this, this.x + (width / 2), this.y - (height), "Press E to Interact", false);
+        engine.addEntity(this.prompt);
     }
 
      /**
      * @param {import('/js/GameEngine.js').default} engine
      */
     update(engine) {
+        var that = this;
+        if (this.toggleState == false) {
+            engine.entities.forEach(function (entity) {
+            if (entity instanceof Player) {
+                if (entity.BB && that.BB.collide(entity.BB)) {
+                    that.prompt.showText();
+                } else {
+                    that.prompt.hideText();
+                }
+            }
+        })
+        } else {
+            this.prompt.hideText();
+        }
         if (this.toggleable == false) {
             this.elapsedTime += engine.getTickSpeed();
             if (this.elapsedTime > this.toggleCooldown) {
@@ -53,6 +73,7 @@ export default class Interactable extends EntityInteractable {
         this.toggleState = true;
         this.color = "#7086f1";
         console.log("Toggled!")
+        this.engine.addEntity(new Item(1, this.x + (this.width / 2), this.y - (this.height), 0, 2))
     }
 
     unToggleEntity() {
