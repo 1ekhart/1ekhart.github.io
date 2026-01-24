@@ -39,7 +39,7 @@ export default class InventoryUI {
     }
 
     draw() {
-        const hotbarStartX = this.backpackButtonSize + this.padding;
+        const hotbarStartX = this.backpackButtonSize + this.padding + 10;
         const hotbarSlots = this.player.inventory.slots.slice(0, this.player.inventory.hotbarSize);
 
         // backpack button
@@ -49,7 +49,8 @@ export default class InventoryUI {
         this.ctx.strokeRect(this.backpackButtonX, this.backpackButtonY, this.backpackButtonSize, this.backpackButtonSize);
         this.ctx.fillStyle = "#fff";
         this.ctx.font = "12px monospace";
-        this.ctx.fillText("B", this.backpackButtonX + 10, this.backpackButtonY + 20);
+        this.ctx.fillText("B", this.backpackButtonX + 13, this.backpackButtonY + 20);
+        
         
         // backpack
         if (this.player.inventory.backpackOpen) {
@@ -57,7 +58,7 @@ export default class InventoryUI {
             const panelHeight = this.backpackRows * (this.slotSize + this.padding) + this.padding;
 
             // backpack background
-            this.ctx.fillStyle = "rgba(88, 42, 18, 0.9";
+            this.ctx.fillStyle = "rgba(88, 42, 18, 0.9)";
             this.ctx.fillRect(this.backpackX, this.backpackY, panelWidth, panelHeight);
             this.ctx.strokeStyle = "#fff";
             this.ctx.strokeRect(this.backpackX, this.backpackY, panelWidth, panelHeight);
