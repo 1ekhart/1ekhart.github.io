@@ -1,10 +1,10 @@
-// TODO: better map editing
-// TODO: ability to swap out different maps
-
+/** @import GameEngine from "/js/GameEngine.js" */
 import Interactable from './Interactable.js';
 
 // size of a tile in screen pixels
 const TILE_SIZE = 32;
+//For some reason the player's Y coordinate is always (n block + 0.46875) * 32
+const Y_FIX = 0.46875;
 
 const tileColors = [
     "#000000",
@@ -12,26 +12,80 @@ const tileColors = [
     "#444444"
 ];
 
-export default class Level {
-    constructor(tileData, engine) {
-        this.data = tileData;
-        // cycle through the tile data to pick which ones are entities to add to the level
 
-        for (let row = 0; row < this.data.length; row++) {
-            const rowData = this.data[row];
-            const rowDataLength = rowData.length;
+const tileData1 = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 1, 0, 0, 0, 1],
+    [1, 1, 1, 1, 2, 1, 0, 0, 0],
+    [2, 2, 2, 2, 2, 2, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 1, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [2, 2, 2, 2, 2, 2, 2, 2, 2]
+];
 
-            for (let column = 0; column < rowDataLength; column++) {
-                const tile = rowData[column];
-                if (tile == 3) {
-                    engine.addEntity(new Interactable(column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE));
-                }
-            }
-        }
+const tileData2 = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 1, 0, 0, 0, 1],
+    [1, 1, 1, 1, 2, 1, 0, 0, 0],
+    [2, 2, 2, 2, 2, 2, 2, 2, 2],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [2, 2, 2, 2, 2, 2, 2, 2, 2]
+];
+
+const tileData3 = [
+    [2, 2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 0, 0, 0, 0, 0, 0, 0, 2],
+    [2, 0, 0, 0, 0, 0, 0, 0, 2],
+    [2, 0, 0, 0, 0, 0, 0, 0, 2],
+    [2, 0, 0, 0, 0, 0, 0, 0, 2],
+    [2, 0, 0, 0, 2, 2, 2, 2, 2],
+    [2, 0, 0, 2, 0, 0, 0, 0, 0],
+    [2, 0, 0, 0, 0, 0, 0, 0, 0],
+    [2, 0, 0, 0, 0, 0, 0, 0, 0],
+    [2, 2, 2, 2, 2, 2, 2, 2, 2]
+];
+
+export default class LevelManager {
+    constructor() {
+        this.toggleCooldown = 1;
+        this.elapsedTime = 0;
+        this.data = tileData1;
     }
 
-    update() {
-
+    //Handling level transitions and player movement
+    update(engine) {
+        const player = engine.getPlayer();
+        if (player.x < -0.25 * TILE_SIZE && Math.floor(player.y) >= 7 * TILE_SIZE && Math.floor(player.y) < 8 * TILE_SIZE && this.data === tileData1) {
+            console.log("1 to 2")
+            this.data = tileData2;
+            player.x = 8 * TILE_SIZE ;
+            player.y = (7 + Y_FIX) * TILE_SIZE - 1;
+        }
+        if (player.x > 8.25 * TILE_SIZE && Math.floor(player.y) >= 7 * TILE_SIZE && Math.floor(player.y) < 8 * TILE_SIZE && this.data === tileData2) {
+            console.log("2 to 1")
+            this.data = tileData1;
+            player.x = 0 * TILE_SIZE;
+            player.y = (7 + Y_FIX) * TILE_SIZE - 1;
+        }
+        if (player.x < -0.25 * TILE_SIZE && Math.floor(player.y) >= 7 * TILE_SIZE && Math.floor(player.y) < 8 * TILE_SIZE && this.data === tileData2) {
+            console.log("2 to 3")
+            this.data = tileData3;
+            player.x = 8 * TILE_SIZE;
+            player.y = (7 + Y_FIX) * TILE_SIZE - 1;
+        }
+        if (player.x > 8 * TILE_SIZE && Math.floor(player.y) >= 7 * TILE_SIZE && Math.floor(player.y) < 8 * TILE_SIZE && this.data === tileData3) {
+            console.log("3 to 2")
+            this.data = tileData2;
+            player.x = 0 * TILE_SIZE;
+            player.y = (7 + Y_FIX) * TILE_SIZE - 1;
+        }
     }
 
     getTile(tileX, tileY) {
@@ -41,14 +95,14 @@ export default class Level {
     checkIfBoxCollides(boxX, boxY, width, height) {
         // convert box position to tile coordinates (right shift by 5 is equivalent to floor divide by 32 (the TILE_SIZE))
         const left = boxX >> 5;
-        const right = (boxX + width) >> 5;
+        const right = (boxX + width - 1) >> 5; // - 1 is so width/height are actual width in pixels (not off by 1)
         const top = boxY >> 5;
-        const bottom = (boxY + height) >> 5;
+        const bottom = (boxY + height - 1) >> 5;
 
         // check all tiles that the box overlaps
-        for(let x = left; x <= right; x++) {
-            for(let y = top; y <= bottom; y++) {
-                if(this.getTile(x, y) !== 0 && this.getTile(x, y) < 3) {
+        for (let x = left; x <= right; x++) {
+            for (let y = top; y <= bottom; y++) {
+                if (this.getTile(x, y) !== 0) {
                     return true;
                 }
             }
@@ -58,7 +112,7 @@ export default class Level {
 
     /**
      * @param {CanvasRenderingContext2D} ctx
-     * @param {import('/js/GameEngine.js').default} engine
+     * @param {GameEngine} engine
      */
     draw(ctx, engine) {
         const data = this.data;
@@ -70,7 +124,7 @@ export default class Level {
 
             for (let column = 0; column < rowDataLength; column++) {
                 const tile = rowData[column];
-                if (tile > 0 && tile < 3) {
+                if (tile > 0) {
                     // temporary box graphics for tiles
                     ctx.fillStyle = tileColors[tile];
                     ctx.fillRect(column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);

@@ -1,3 +1,9 @@
+/** @import Entity from "/js/Entity.js" */
+/** @import Level from "/js/Level.js" */
+/** @import Player from "/js/Player.js" */
+
+import { CONSTANTS } from "/js/Util.js";
+
 const INPUT_MAP = {
     "KeyW": "up",
     "KeyA": "left",
@@ -14,7 +20,7 @@ const INPUT_MAP = {
 };
 
 // the amount of time per engine tick
-const TICK_TIME = 1 / 60;
+const TICK_TIME = CONSTANTS.TICK_TIME;
 
 // This game shell was happily modified from Googler Seth Ladd's "Bad Aliens" game and his Google IO talk in 2011
 export default class GameEngine {
@@ -24,6 +30,7 @@ export default class GameEngine {
         this.ctx = null;
 
         // Everything that will be updated and drawn each frame
+        /** @type {Entity[]} */
         this.entities = [];
 
         // Information on the input
@@ -41,7 +48,6 @@ export default class GameEngine {
     /** @param {CanvasRenderingContext2D} ctx */
     init(ctx) {
         this.ctx = ctx;
-        ctx.font = "12px monospace";
         this.startInput();
         this.timeAccumulator = 0;
         this.lastTimestamp = 0;
@@ -105,13 +111,23 @@ export default class GameEngine {
     };
 
     // the Level is a special entity that many other entities will need to access directly
-    /** @param {import('/js/Level.js').default} level */
+    /** @param {Level} level */
     setLevel(level) {
-        this.entities.push(level);
+        this.addEntity(level);
         this.level = level;
     }
     getLevel() {
         return this.level;
+    }
+
+    // same w/ the player
+    /** @param {Player} player */
+    setPlayer(player) {
+        this.addEntity(player);
+        this.player = player;
+    }
+    getPlayer() {
+        return this.player
     }
 
     draw() {
@@ -120,6 +136,10 @@ export default class GameEngine {
 
         for (const entity of this.entities) {
             entity.draw(this.ctx, this);
+        }
+
+        if (this.inventoryUI) {
+            this.inventoryUI.draw();
         }
     };
 
@@ -132,6 +152,12 @@ export default class GameEngine {
             if (!entity.removeFromWorld) {
                 entity.update(this);
             }
+        }
+
+        // backpack
+        if (this.click && this.inventoryUI) {
+            this.inventoryUI.handleBackpackClick(this.click);
+            this.click = null;
         }
 
         for (let i = this.entities.length - 1; i >= 0; --i) {
@@ -152,16 +178,12 @@ export default class GameEngine {
             this.timeAccumulator -= TICK_TIME;
         }
         if (this.timeAccumulator > TICK_TIME * 5) {  // remove extra steps worth of time that could not be processed
-            console.warn(`update took too long! behind by ${Math.floor(this.timeAccumulator / TICK_TIME)}ms`);
+            // console.warn(`update took too long! behind by ${Math.floor(this.timeAccumulator / TICK_TIME)}ms`);
             this.timeAccumulator = this.timeAccumulator % TICK_TIME;
         }
 
         this.draw(deltaTime);
-        this.ctx.fillStyle = "black"
+        this.ctx.fillStyle = "black";
         this.ctx.fillText(`fps: ${(1 / deltaTime).toFixed(2)}`, 0, 12);
-    }
-
-    getTickSpeed() {
-        return TICK_TIME;
     }
 }

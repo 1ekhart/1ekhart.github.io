@@ -1,23 +1,20 @@
-// base entity class containing common useful behavior
-// (you don't have to inherit from this; Level doesn't)
+/** @import GameEngine from "/js/GameEngine.js" */
 
+// base entity class; all entities should probably inherit from this
 export default class Entity {
-    constructor() {
-        this.x = 0;
-        this.y = 0;
+    constructor() { }
+
+    /** removes this entity from the world */
+    remove() {
+        this.removeFromWorld = true;
     }
 
-    update() {
-
-    }
+    /** @param {GameEngine} engine */
+    update(engine) { }
 
     /**
      * @param {CanvasRenderingContext2D} ctx
-     * @param {import('/js/GameEngine.js').default} engine
+     * @param {GameEngine} engine
      */
-    draw(ctx, engine) {
-        // draw *something* if a subclass doesn't correctly draw anything
-        ctx.fillStyle = "#ff00ff"
-        ctx.fillRect(this.x, this.y, 32, 32);
-    }
+    draw(ctx, engine) { }
 }

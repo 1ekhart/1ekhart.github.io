@@ -1,5 +1,6 @@
-import Entity from "./AbstractClasses/Entity.js";
-import GameEngine from "/js/GameEngine.js";
+/** @import GameEngine from "/js/GameEngine.js" */
+import Entity from "/js/AbstractClasses/Entity.js";
+import { CONSTANTS } from "/js/Util.js";
 
 // how many seconds each day will last. Each day is 24 hours, so the hour length will be DAY_LENGTH / 24 and minutes  will be 60/hour length
 const DAY_LENGTH = 60; // 200 day length means each minute will be rough 0.14 seconds
@@ -35,12 +36,10 @@ export default class InGameClock extends Entity {
 
 
     /**
-     * @param {import('/js/GameEngine.js').default} engine
+     * @param {GameEngine} engine
      */
     update(engine) {
-        // this.dayTime += 1 * engine.deltaTime;
-        this.dayTime += engine.getTickSpeed();
-
+        this.dayTime += CONSTANTS.TICK_TIME;
 
         if (this.dayTime >= DAY_LENGTH) {
             this.dayTime = HOUR_LENGTH * STARTING_HOUR;
@@ -50,12 +49,10 @@ export default class InGameClock extends Entity {
 
     /**
      * @param {CanvasRenderingContext2D} ctx
-     * @param {import('/js/GameEngine.js').default} engine
+     * @param {GameEngine} engine
      */
     draw(ctx, engine) {
-        // draw *something* if a subclass doesn't correctly draw anything
-        ctx.fillStyle = "#000000"
-        // ctx.fillRect(this.x, this.y, 32, 32);
+        ctx.fillStyle = "#000000";
         ctx.fillText(
             `Day ${this.dayCount} at (${this.getGameHour()} : ${this.getGameMinute()})
             Game Time: ${this.dayTime}

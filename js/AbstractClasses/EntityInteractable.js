@@ -1,14 +1,10 @@
-// modification to the entity class to have an interactable item that does something 
+import WorldEntity from "/js/AbstractClasses/WorldEntity.js";
 
-export default class EntityInteractable {
+/** modification to the entity class to have an interactable item that does something */
+export default class EntityInteractable extends WorldEntity {
     constructor() {
-        this.x = 0;
-        this.y = 0;
+        super();
         this.toggleState = false;
-    }
-
-    update() {
-        
     }
 
     toggleEntity() {
@@ -17,15 +13,5 @@ export default class EntityInteractable {
 
     unToggleEntity() {
 
-    }
-
-    /**
-     * @param {CanvasRenderingContext2D} ctx
-     * @param {import('/js/GameEngine.js').default} engine
-     */
-    draw(ctx, engine) {
-        // draw *something* if a subclass doesn't correctly draw anything
-        ctx.fillStyle = "#ff00ff"
-        ctx.fillRect(this.x, this.y, 32, 32);
     }
 }
