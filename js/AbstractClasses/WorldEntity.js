@@ -1,4 +1,5 @@
 import Entity from "/js/AbstractClasses/Entity.js";
+import { decreaseToZero } from "/js/Util.js";
 
 /** an Entity that contains common useful behavior for physical entities in the world */
 export default class WorldEntity extends Entity {
@@ -23,25 +24,22 @@ export default class WorldEntity extends Entity {
     }
 
     /** @param {GameEngine} engine */
-    moveColliding() {
+    moveColliding(engine) {
         const level = engine.getLevel();
 
         // attempt to move, reducing velocity until no collision occurs (to touch the wall exactly)
-        while (this.xVelocity > 0 && level.checkIfBoxCollides(this.x + this.xVelocity, this.y, this.width, this.height)) {
-            this.xVelocity -= 1;
-        }
-        while (this.xVelocity < 0 && level.checkIfBoxCollides(this.x + this.xVelocity, this.y, this.width, this.height)) {
-            this.xVelocity += 1;
+        while (this.xVelocity !== 0 && level.checkIfBoxCollides(this.x + this.xVelocity, this.y, this.width, this.height)) {
+            this.xVelocity = decreaseToZero(this.xVelocity, 1);
         }
         this.x += this.xVelocity;
 
         this.onGround = false;
         while (this.yVelocity > 0 && level.checkIfBoxCollides(this.x, this.y + this.yVelocity, this.width, this.height)) {
-            this.yVelocity -= 1;
+            this.yVelocity = decreaseToZero(this.yVelocity, 1);
             this.onGround = true; // we collided with something while moving down
         }
         while (this.yVelocity < 0 && level.checkIfBoxCollides(this.x, this.y + this.yVelocity, this.width, this.height)) {
-            this.yVelocity += 1;
+            this.yVelocity = decreaseToZero(this.yVelocity, 1);
         }
         this.y += this.yVelocity;
     }
