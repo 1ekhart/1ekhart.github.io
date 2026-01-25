@@ -2,11 +2,14 @@
 import WorldEntity from "/js/AbstractClasses/WorldEntity.js";
 import Animator from "/js/GeneralUtils/Animator.js";
 import Inventory from "/js/Inventory.js";
-import { CONSTANTS } from "/js/Util.js";
+import { CONSTANTS, decreaseToZero } from "/js/Util.js";
 
 const floor = Math.floor;
 
 const WALKING_SPEED = 6;
+const ACCELERATION = 1;
+const JUMPING_STRENGTH = -9.5;
+const GRAVITY = 0.75;
 
 export default class Player extends WorldEntity {
     constructor(x, y) {
@@ -61,16 +64,14 @@ export default class Player extends WorldEntity {
         // movement
         // TODO: adjust acceleration & drag to 'feel' better, these are placeholder values
         if (engine.input.left && this.xVelocity > -WALKING_SPEED) {
-            this.xVelocity -= 1; // acceleration
+            this.xVelocity -= ACCELERATION;
         } else if (engine.input.right && this.xVelocity < WALKING_SPEED) {
-            this.xVelocity += 1;
-        } else if (this.xVelocity > 0) {
-            this.xVelocity -= 0.5; // drag
-        } else if (this.xVelocity < 0) {
-            this.xVelocity += 0.5;
+            this.xVelocity += ACCELERATION;
+        } else {
+            this.xVelocity = decreaseToZero(this.xVelocity, GRAVITY / 2); // deceleration with no inputs held
         }
         if (this.onGround && engine.input.jump) {
-            this.yVelocity = -11; // jump strength
+            this.yVelocity = JUMPING_STRENGTH;
         }
 
         if (engine.input.left) {
@@ -85,16 +86,16 @@ export default class Player extends WorldEntity {
 
 
         // gravity
-        if (engine.input.jump) {
-            this.yVelocity += 0.5;
+        if (engine.input.jump && this.yVelocity < 0) {
+            this.yVelocity += (GRAVITY / 2);
+        } else if (engine.input.down){
+            this.yVelocity += (GRAVITY * 1.5);
         } else {
-            this.yVelocity += 1;
+            this.yVelocity += GRAVITY;
         }
 
         // collision
         this.moveColliding(engine);
-
-        // this.y = 240;
     }
 
     /**
@@ -102,10 +103,12 @@ export default class Player extends WorldEntity {
      * @param {GameEngine} engine
      */
     draw(ctx, engine) {
-        this.animations[this.animationState].drawFrame(CONSTANTS.TICK_TIME, ctx, this.x - 17, floor(this.y) - this.height + 32, !this.isRight)
+        this.animations[this.animationState].drawFrame(CONSTANTS.TICK_TIME, ctx,
+            this.x * CONSTANTS.SCALE - (18 * CONSTANTS.SCALE), floor(this.y * CONSTANTS.SCALE) - (this.height * CONSTANTS.SCALE) + (32 * CONSTANTS.SCALE),
+             !this.isRight, 2 * CONSTANTS.SCALE)
         if (CONSTANTS.DEBUG == true) {
             ctx.strokeStyle = "#aa0000";
-            ctx.strokeRect(floor(this.x), floor(this.y), this.width, this.height);
+            ctx.strokeRect(floor(this.x * CONSTANTS.SCALE), floor(this.y * CONSTANTS.SCALE), this.width * CONSTANTS.SCALE, this.height * CONSTANTS.SCALE);
         }
     }
 }

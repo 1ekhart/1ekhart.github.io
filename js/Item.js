@@ -6,6 +6,8 @@ import { CONSTANTS } from '/js/Util.js';
 const HITBOX_WIDTH = 16;
 const HITBOX_HEIGHT = 16;
 const PICKUP_COOLDOWN = 1; // the item can't be picked up for this amount of time;
+const DRAG = 1;
+const GRAVITY = 1;
 
 export default class Item extends WorldEntity {
     constructor(itemID, x, y, initVelocityX, initVelocityY, quantity) {
@@ -35,6 +37,14 @@ export default class Item extends WorldEntity {
     }
 
     update(engine) {
+        if (this.xVelocity > 0) {
+            this.xVelocity -= DRAG;
+        } if (this.xVelocity < 0) {
+            this.xVelocity += DRAG;
+        }
+
+        this.yVelocity += GRAVITY;
+
         this.moveColliding(engine);
 
         // do the timer for when the item's able to be picked up.
@@ -76,6 +86,6 @@ export default class Item extends WorldEntity {
         } else {
         ctx.fillStyle = "#ff00ff"
         }
-        ctx.fillRect(this.x, this.y, HITBOX_WIDTH, HITBOX_HEIGHT);
+        ctx.fillRect(this.x * CONSTANTS.SCALE, this.y * CONSTANTS.SCALE, HITBOX_WIDTH * CONSTANTS.SCALE, HITBOX_HEIGHT * CONSTANTS.SCALE);
     }
 }
