@@ -86,6 +86,6 @@ export default class Item extends WorldEntity {
         } else {
         ctx.fillStyle = "#ff00ff"
         }
-        ctx.fillRect(this.x - engine.camera.x, this.y, HITBOX_WIDTH, HITBOX_HEIGHT);
+        ctx.fillRect(this.x - engine.camera.x, this.y - engine.camera.y, HITBOX_WIDTH, HITBOX_HEIGHT);
     }
 }

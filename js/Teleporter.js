@@ -48,11 +48,12 @@ export default class Teleporter extends EntityInteractable {
 
     draw(ctx, engine) {
         ctx.fillStyle = "#d37cd3";
-        ctx.fillRect(this.renderX - engine.camera.x, this.renderY,
+        ctx.fillRect(this.renderX - engine.camera.x, this.renderY - engine.camera.y,
         this.width / 2, this.height / 2);
+        
         if (CONSTANTS.DEBUG == true) {
             ctx.strokeStyle = "#aa0000";
-            ctx.strokeRect(Math.floor(this.x - engine.camera.x), Math.floor(this.y), this.width, this.height);
+            ctx.strokeRect(Math.floor(this.x - engine.camera.x), Math.floor(this.y - engine.camera.y), this.width, this.height);
         }
     }
 }

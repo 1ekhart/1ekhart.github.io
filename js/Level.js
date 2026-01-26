@@ -6,8 +6,14 @@ import { CONSTANTS } from '/js/Util.js';
 const TILE_SIZE = 32;
 //For some reason the player's Y coordinate is always (n block + 0.46875) * 32
 const Y_FIX = 0.46875;
-const HORIZONTAL_FORGIVENESS = 16; // don't move the camera horizontally if the player hasn't moved this far from the middle.
-const VERTICAL_FORGIVENESS = 16; // don't move the camera vertically if the player hasn't moved this far from the middle.
+
+// don't move the camera horizontally/vertically if the player hasn't moved this far from the middle.
+const HORIZONTAL_FORGIVENESS = 1 * CONSTANTS.TILESIZE; 
+const VERTICAL_FORGIVENESS = 1 * CONSTANTS.TILESIZE;
+
+// offset the camera by this much to center the player
+const CAMERA_OFFSET_X = CONSTANTS.CANVAS_WIDTH / (2 * CONSTANTS.SCALE); 
+const CAMERA_OFFSET_Y = CONSTANTS.CANVAS_HEIGHT / (1.75 * CONSTANTS.SCALE);  // edit the number to change the vertical position of the camera
 
 const tileColors = [
     "#000000",
@@ -107,35 +113,30 @@ export default class LevelManager {
 
     //Handling level transitions and player movement
     update(engine) {
-        // let horizontalMidpoint = (CONSTANTS.CANVAS_WIDTH / 2) / 2;
-        // let verticalMidpoint = (CONSTANTS.CANVAS_HEIGHT / 2) / 2;
-        // if (this.x < this.player.x - (horizontalMidpoint) - HORIZONTAL_FORGIVENESS) {
-        //     this.x = (this.player.x - horizontalMidpoint) - HORIZONTAL_FORGIVENESS - CONSTANTS.CANVAS_WIDTH / TILE_SIZE;
-        // }
-        // if (this.x > this.player.x + horizontalMidpoint + HORIZONTAL_FORGIVENESS) {
-        //     this.x = (this.player.x + horizontalMidpoint) + HORIZONTAL_FORGIVENESS - CONSTANTS.CANVAS_WIDTH/ TILE_SIZE;
-        // }
+        // update the camera to fit player coordinates.
+        let relPlayerX = this.player.x + this.player.width / (2 * CONSTANTS.SCALE) - CAMERA_OFFSET_X;
+        let relplayerY = this.player.y + this.player.height / (2 * CONSTANTS.SCALE) - CAMERA_OFFSET_Y;
 
-        this.x = (this.player.x + this.player.width / (2 * CONSTANTS.SCALE)) - CONSTANTS.CANVAS_WIDTH / (2 * CONSTANTS.SCALE)
-        // this.y = (this.player.y + this.player.height / 2) - CONSTANTS.CANVAS_HEIGHT / 2
+        let leftOffsetX = relPlayerX - HORIZONTAL_FORGIVENESS;
+        let rightOffsetX = relPlayerX + HORIZONTAL_FORGIVENESS;
+        let topOffsetY = relplayerY - VERTICAL_FORGIVENESS;
+        let lowOffsetY = relplayerY + VERTICAL_FORGIVENESS; 
 
-        // if (this.y > this.player.y - verticalMidpoint) {
-        //     this.y = this.player.y - verticalMidpoint;
-        // }
+        if (this.x < leftOffsetX) {
+            this.x = leftOffsetX;
+        } else if (this.x > rightOffsetX) {
+            this.x = rightOffsetX;
+        }
 
-        // if (this.y < this.player.y + verticalMidpoint) {
-        //     this.y = this.player.y + verticalMidpoint;
-        // }
+        if (this.y < topOffsetY) {
+            this.y = topOffsetY;
+        } else if (this.y > lowOffsetY) {
+            this.y = lowOffsetY;
+        }
 
-        // if (this.x < this.player.x - HORIZONTAL_FORGIVENESS) {
-        //     console.log(this.x)
-        //     this.x = this.player.x - HORIZONTAL_FORGIVENESS ; 
-        // }
 
-        // if (this.x > this.player.x + HORIZONTAL_FORGIVENESS) {
-        //     console.log(this.x)
-        //     this.x = this.player.x + HORIZONTAL_FORGIVENESS;
-        // }
+        // this.x = (this.player.x + this.player.width / (2 * CONSTANTS.SCALE)) - CAMERA_OFFSET_X;
+        // this.y = (this.player.y + this.player.height / 3 * CONSTANTS.SCALE) - CAMERA_OFFSET_Y;
 
 
 
@@ -194,10 +195,14 @@ export default class LevelManager {
     draw(ctx, engine) {
         const data = this.data;
         const dataLength = data.length;
-        // ctx.strokeStyle = "#aa0000";
-        // ctx.strokeRect((CONSTANTS.CANVAS_WIDTH/2 - HORIZONTAL_FORGIVENESS) * CONSTANTS.SCALE, 
-        // (CONSTANTS.CANVAS_HEIGHT/2 - VERTICAL_FORGIVENESS) * CONSTANTS.SCALE,
-        // HORIZONTAL_FORGIVENESS * 2 * CONSTANTS.SCALE, VERTICAL_FORGIVENESS * 2 * CONSTANTS.SCALE)
+
+        if (CONSTANTS.DEBUG) {
+        ctx.strokeStyle = "#706ccd";
+        ctx.strokeRect((CAMERA_OFFSET_X - HORIZONTAL_FORGIVENESS), 
+        (CAMERA_OFFSET_Y - VERTICAL_FORGIVENESS),
+        HORIZONTAL_FORGIVENESS * 2, VERTICAL_FORGIVENESS * 2)
+        }
+
 
         for (let row = 0; row < dataLength; row++) {
             const rowData = data[row];
@@ -208,7 +213,7 @@ export default class LevelManager {
                 if (tile > 0) {
                     // temporary box graphics for tiles
                     ctx.fillStyle = tileColors[tile];
-                    ctx.fillRect(column * TILE_SIZE- this.x, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                    ctx.fillRect(column * TILE_SIZE - this.x, row * TILE_SIZE - this.y, TILE_SIZE, TILE_SIZE);
                 }
             }
         }

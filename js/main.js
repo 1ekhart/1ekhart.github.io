@@ -39,7 +39,7 @@ ASSET_MANAGER.downloadAll(() => {
     gameEngine.addEntity(new CollisionTester());
     // gameEngine.addEntity(new CropEntity(2 * 32, 8 * 32));
     // gameEngine.addEntity(new CropEntity(5 * 32, 8 * 32));
-    gameEngine.addEntity(new Interactable(3 * 32 - 16, 2 * 32 - 16, 64, 64, gameEngine));
+    gameEngine.addEntity(new Interactable(4 * 32 - 16, 4 * 32 - 16, 64, 64, gameEngine));
     gameEngine.addEntity(new Interactable(1 * 32 - 16, 8 * 32 - 16, 64, 64, gameEngine));
     gameEngine.addEntity(new Teleporter(gameEngine, 4*tileSize, 8*tileSize, tileSize, tileSize, 1))
     gameEngine.addEntity(new Teleporter(gameEngine, 7*tileSize, 8*tileSize, tileSize, tileSize, 2))

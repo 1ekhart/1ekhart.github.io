@@ -41,7 +41,7 @@ export default class Animator {
             this.xStart + frame * (this.width + this.framePadding), this.yStart,
             this.width, this.height,
             x, y,
-            this.width*theScale, this.height * theScale);
+            Math.floor(this.width*theScale), Math.floor(this.height * theScale));
         }
     };
 
