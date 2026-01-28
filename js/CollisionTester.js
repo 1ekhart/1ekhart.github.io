@@ -11,8 +11,8 @@ export default class CollisionTester extends WorldEntity {
 
     update(engine) {
         if (engine.mouse) {
-            this.x = engine.mouse.x;
-            this.y = engine.mouse.y;
+            this.x = engine.mouse.x / CONSTANTS.SCALE;
+            this.y = engine.mouse.y / CONSTANTS.SCALE;
         }
     }
 
@@ -32,6 +32,6 @@ export default class CollisionTester extends WorldEntity {
                 break;
             }
         }
-        ctx.fillRect(this.x, this.y, this.width * CONSTANTS.SCALE, this.height * CONSTANTS.SCALE);
+        ctx.fillRect(this.x, this.y, this.width, this.height);
     }
 }

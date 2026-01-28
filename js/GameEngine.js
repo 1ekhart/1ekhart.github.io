@@ -2,6 +2,7 @@
 /** @import Level from "/js/Level.js" */
 /** @import Player from "/js/Player.js" */
 
+import InGameClock from "/js/InGameClock.js";
 import { CONSTANTS } from "/js/Util.js";
 
 const INPUT_MAP = {
@@ -128,6 +129,17 @@ export default class GameEngine {
     }
     getPlayer() {
         return this.player
+    }
+
+    // the in-game clock may also need to be accessed by many other entities who use logic that's virtually timed.
+    /** @param {InGameClock} clock */
+    setClock(clock) {
+        this.addEntity(clock);
+        this.clock = clock;
+    }
+
+    getClock() {
+        return this.clock;
     }
 
     draw() {
