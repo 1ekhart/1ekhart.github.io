@@ -42,7 +42,6 @@ ASSET_MANAGER.downloadAll(() => {
     gameEngine.addEntity(new PrepStation(3 * 32, 9 * 32 - 32, 32, 32, new CookingStation("1"), gameEngine));
 
 
-
     gameEngine.start();
 });
 

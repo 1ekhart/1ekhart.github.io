@@ -22,7 +22,7 @@ export default class PrepStation extends EntityInteractable {
         this.toggleState = false;
         this.toggleable = true;
 
-        this.assemblyTime = 200; // fixed time per ingredient for now
+        this.assemblyTime = 240; // fixed time per ingredient for now : 4 sec
         this.prompt = new OnScreenTextSystem(this, (this.x + width / 2) * CONSTANTS.SCALE, (this.y - height / 4) * CONSTANTS.SCALE, "Press E to Assemble", false);
         this.ingredientText = new OnScreenTextSystem(this, (this.x + width / 2) * CONSTANTS.SCALE, (this.y - height / 2 - 10) * CONSTANTS.SCALE, "", false)
         this.timer = new OnScreenTextSystem(this, (this.x + width / 2) * CONSTANTS.SCALE, (this.y - height / 4) * CONSTANTS.SCALE, "0.0" + Math.ceil(this.assemblyTime / 60), false);
@@ -87,8 +87,14 @@ export default class PrepStation extends EntityInteractable {
 
     interact(player) {
         if (this.station.isComplete()) {
-            player.inventory.addItem({ itemID: this.station.currentOrder, quantity: 1});
-            console.log("Collected Order!");
+            const success = player.inventory.addItem({ itemID: this.station.currentOrder, quantity: 1});
+
+            if (!success) {
+                console.log("Inventory is full!");
+                return;
+            }
+
+            console.log("Collected", this.station.currentOrder);
             this.station.reset();
             this.color = idleColor;
             this.toggleState = false;

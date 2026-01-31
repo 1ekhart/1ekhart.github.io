@@ -2,7 +2,7 @@
 const HOTBAR_SIZE = 2;
 
 // backpack # of slots
-const BACKPACK_SIZE = 2;
+const BACKPACK_SIZE = 1;
 
 export default class Inventory {
     constructor() {

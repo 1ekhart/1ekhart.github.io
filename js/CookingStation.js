@@ -6,7 +6,7 @@ export default class CookingStation {
 
         //this.state = STATION_STATE.IDLE;
         this.state = STATION_STATE.ASSEMBLE_READY; // for testing prep station
-        this.currentOrder = "Burger";
+        this.currentOrder = "Burger";   // for testing
 
         // oven - cooking phase
         this.cookProgress = 0;
