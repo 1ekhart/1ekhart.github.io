@@ -1,4 +1,5 @@
 import Inventory from "/js/Inventory.js";
+import { CONSTANTS } from "/js/Util.js";
 
 const SLOT_SIZE = 32;
 const PADDING = 5;
@@ -12,7 +13,7 @@ export default class InventoryUI {
 
         this.slotSize = SLOT_SIZE;
         this.padding = PADDING;
-        this.hotbarY = ctx.canvas.height - this.slotSize - 10;
+        this.hotbarY = (ctx.canvas.height / CONSTANTS.SCALE) - this.slotSize - 10;
 
         this.backpackButtonX = 10;
         this.backpackButtonY = this.hotbarY;
@@ -26,8 +27,8 @@ export default class InventoryUI {
     }
 
     handleBackpackClick(click) {
-        const x = click.x;
-        const y = click.y;
+        const x = click.x / CONSTANTS.SCALE;
+        const y = click.y / CONSTANTS.SCALE;
 
         if (x >= this.backpackButtonX && x <= this.backpackButtonX + this.backpackButtonSize &&
             y >= this.backpackButtonY && y <= this.backpackButtonY + this.backpackButtonSize) {

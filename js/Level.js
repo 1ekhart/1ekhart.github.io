@@ -1,11 +1,17 @@
 /** @import GameEngine from "/js/GameEngine.js" */
 import Interactable from './Interactable.js';
+import InGameClock from '/js/InGameClock.js';
+import PottedPlant from '/js/PottedPlant.js';
+import Teleporter from '/js/Teleporter.js';
 import { CONSTANTS } from '/js/Util.js';
 
 // size of a tile in screen pixels
 const TILE_SIZE = 32;
 //For some reason the player's Y coordinate is always (n block + 0.46875) * 32
 const Y_FIX = 0.46875;
+
+// sets the game to this hour (15:00)
+const ResetHour = 15;
 
 // don't move the camera horizontally/vertically if the player hasn't moved this far from the middle.
 const HORIZONTAL_FORGIVENESS = 1 * CONSTANTS.TILESIZE; 
@@ -91,20 +97,72 @@ export default class LevelManager {
     constructor(engine) {
         this.toggleCooldown = 1;
         engine.camera = this;
+        this.engine = engine;
         this.elapsedTime = 0;
-        this.data = level1;
+        this.sceneEntities =  [];
+        this.loadLevel1();
         this.player = engine.getPlayer();
         this.player.x = 4 * TILE_SIZE;
         this.player.y = 1 * TILE_SIZE;
         this.x = this.player.x;
         this.y = this.player.y;
+        // this.reloadClock();
+        
+        //  keeps track of entities so we can load or destroy all of the entities in a particular scene.
+        
     }
 
+    //Initialize level 1;
+    loadLevel1() {
+        // refresh scene entities
+        this.sceneEntities.forEach(function (entity) {
+            entity.removeFromWorld = true;
+        })
+        this.data = level1;
+
+        this.sceneEntities = [];
+        this.sceneEntities.push(new Interactable(4 * TILE_SIZE - (TILE_SIZE/2), 4 * TILE_SIZE - (TILE_SIZE/2), TILE_SIZE*2, TILE_SIZE*2, this.engine));
+        this.sceneEntities.push(new Interactable(2 * TILE_SIZE - (TILE_SIZE/2), 8 * TILE_SIZE - (TILE_SIZE/2), TILE_SIZE*2, TILE_SIZE*2, this.engine));
+        this.sceneEntities.push(new Teleporter(this.engine, 4*TILE_SIZE, 8*TILE_SIZE, TILE_SIZE, TILE_SIZE, 1));
+        this.sceneEntities.push(new Teleporter(this.engine, 7*TILE_SIZE, 8*TILE_SIZE, TILE_SIZE, TILE_SIZE, 2));
+        this.sceneEntities.push(new PottedPlant(this.engine, 12 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE, TILE_SIZE, 3, this.engine.getClock().dayCount));
+        this.sceneEntities.push(new PottedPlant(this.engine, 15 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE, TILE_SIZE, 3, this.engine.getClock().dayCount));
+
+        const engine = this.engine;
+        this.sceneEntities.forEach(function (entity) {
+            engine.addEntity(entity);
+        })
+        // this.reloadClock();
+    }
+
+    //Initialize level 2
+    loadLevel2() {
+        this.sceneEntities.forEach(function (entity) {
+            entity.removeFromWorld = true;
+        })
+        this.data = level2;
+
+        this.sceneEntities = [];
+        this.sceneEntities.push(new Teleporter(this.engine, 4*TILE_SIZE, 7*TILE_SIZE, TILE_SIZE, TILE_SIZE, 1))
+
+        const engine = this.engine;
+        this.sceneEntities.forEach(function (entity) {
+            engine.addEntity(entity);
+        })
+        this.reloadClock();
+    }
+
+    reloadClock() {
+        const clock = this.engine.getClock();
+        this.engine.setClock(new InGameClock());
+        this.engine.getClock().removeFromWorld = true;
+        this.engine.setClock(clock);
+    }
     teleport(level, x, y) {
         if (level == 2) {
-            this.data = level2;
+            this.loadLevel2();
         } else if (level == 1) {
-            this.data = level1;
+            this.loadLevel1();
         }
 
         this.player.x = x * TILE_SIZE;
@@ -113,7 +171,7 @@ export default class LevelManager {
 
     //Handling level transitions and player movement
     update(engine) {
-        // update the camera to fit player coordinates.
+        // update the camera to fit player coordinates and stay centered.
         let relPlayerX = this.player.x + this.player.width / (2 * CONSTANTS.SCALE) - CAMERA_OFFSET_X;
         let relplayerY = this.player.y + this.player.height / (2 * CONSTANTS.SCALE) - CAMERA_OFFSET_Y;
 
@@ -133,37 +191,6 @@ export default class LevelManager {
         } else if (this.y > lowOffsetY) {
             this.y = lowOffsetY;
         }
-
-
-        // this.x = (this.player.x + this.player.width / (2 * CONSTANTS.SCALE)) - CAMERA_OFFSET_X;
-        // this.y = (this.player.y + this.player.height / 3 * CONSTANTS.SCALE) - CAMERA_OFFSET_Y;
-
-
-
-        // if (player.x <= -0 * TILE_SIZE && Math.floor(player.y) >= 7 * TILE_SIZE && Math.floor(player.y) < 8 * TILE_SIZE && this.data === tileData1) {
-        //     console.log("1 to 2")
-        //     this.data = tileData2;
-        //     player.x = 8 * TILE_SIZE ;
-        //     player.y = (7 + Y_FIX) * TILE_SIZE - 1;
-        // }
-        // if (player.x > 8 * TILE_SIZE && Math.floor(player.y) >= 7 * TILE_SIZE && Math.floor(player.y) < 8 * TILE_SIZE && this.data === tileData2) {
-        //     console.log("2 to 1")
-        //     this.data = tileData1;
-        //     player.x = 0 * TILE_SIZE;
-        //     player.y = (7 + Y_FIX) * TILE_SIZE - 1;
-        // }
-        // if (player.x < -0 * TILE_SIZE && Math.floor(player.y) >= 7 * TILE_SIZE && Math.floor(player.y) < 8 * TILE_SIZE && this.data === tileData2) {
-        //     console.log("2 to 3")
-        //     this.data = tileData3;
-        //     player.x = 8 * TILE_SIZE;
-        //     player.y = (7 + Y_FIX) * TILE_SIZE - 1;
-        // }
-        // if (player.x > 8 * TILE_SIZE && Math.floor(player.y) >= 7 * TILE_SIZE && Math.floor(player.y) < 8 * TILE_SIZE && this.data === tileData3) {
-        //     console.log("3 to 2")
-        //     this.data = tileData2;
-        //     player.x = 0 * TILE_SIZE;
-        //     player.y = (7 + Y_FIX) * TILE_SIZE - 1;
-        // }
     }
 
     getTile(tileX, tileY) {

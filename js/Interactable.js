@@ -21,7 +21,7 @@ export default class Interactable extends EntityInteractable {
 
         this.toggleState = false;
         this.prompt = new OnScreenTextSystem(this,
-            this.x + (width / 4), this.y - (height / 4), "Press E to Interact", false);
+            this.x + (width / 4), this.y - (height / 4), "Press E to Interact with Objects", false);
         engine.addEntity(this.prompt);
     }
 
