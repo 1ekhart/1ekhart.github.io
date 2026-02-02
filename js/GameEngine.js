@@ -1,6 +1,7 @@
 /** @import Entity from "/js/Entity.js" */
 /** @import Level from "/js/Level.js" */
 /** @import Player from "/js/Player.js" */
+/** @import Cursor from "/js/GeneralUtils/Cursor.js" */
 
 import InGameClock from "/js/InGameClock.js";
 import { CONSTANTS } from "/js/Util.js";
@@ -33,6 +34,9 @@ export default class GameEngine {
         // Everything that will be updated and drawn each frame
         /** @type {Entity[]} */
         this.entities = [];
+        
+        // Top-level UI elements
+        this.UIEntities = [];
 
         // Information on the input
         this.click = null;
@@ -115,6 +119,10 @@ export default class GameEngine {
         this.entities.push(entity);
     };
 
+    addUIEntity(entity) {
+        this.UIEntities.push(entity);
+    }
+
     // the Level is a special entity that many other entities will need to access directly
     /** @param {Level} level */
     setLevel(level) {
@@ -133,6 +141,18 @@ export default class GameEngine {
     }
     getPlayer() {
         return this.player
+    }
+
+    /** @param {Cursor} cursor */
+    setCursor(cursor) {
+        this.addUIEntity(cursor);
+        this.cursor = cursor;
+    }
+
+    // signals which mouse sprite to change to. 0 is a normal sprite, while 1 is a pointer sprite.
+    /** @param {Number} signal */
+    setMouseSignal(signal) {
+       this.cursor.setSprite(signal);
     }
 
     // the in-game clock may also need to be accessed by many other entities who use logic that's virtually timed.
@@ -154,8 +174,13 @@ export default class GameEngine {
             entity.draw(this.ctx, this);
         }
 
-        if (this.inventoryUI) {
-            this.inventoryUI.draw();
+        // June Note: Commented out because I moved inventoryUI to the UI entities array.
+        // if (this.inventoryUI) {
+        //     this.inventoryUI.draw();
+        // }
+
+        for (const entity of this.UIEntities) {
+            entity.draw(this.ctx, this);
         }
     };
 
@@ -167,20 +192,43 @@ export default class GameEngine {
 
             if (!entity.removeFromWorld) {
                 entity.update(this);
-            }
-        }
-
-        // backpack
-        if (this.click && this.inventoryUI) {
-            this.inventoryUI.handleBackpackClick(this.click);
-            this.click = null;
-        }
-
-        for (let i = this.entities.length - 1; i >= 0; --i) {
-            if (this.entities[i].removeFromWorld) {
+            } else { // small change to remove elements without re-iterating through the entity list
                 this.entities.splice(i, 1);
+                i--;
+                entitiesCount--;
             }
         }
+
+        // June Note: My code doesn't has the backpack as a plain entity so this is commented out and handled in the update() for inventoryUI
+        // // backpack
+        // if (this.click && this.inventoryUI) {
+        //     const clickedButton = this.inventoryUI.handleBackpackClick(this.click);
+
+        //     if (!clickedButton) {
+        //         this.inventoryUI.handleSlotClick(this.click);
+        //     }
+        //     this.click = null;
+        // }
+        
+        let UIEntitiesLength = this.UIEntities.length;
+
+        for (let i = 0; i < UIEntitiesLength; i++) {
+            let entity = this.UIEntities[i];
+
+            if (!entity.removeFromWorld) {
+                entity.update(this);
+            } else { // small change to remove elements without re-iterating through the entity list
+                this.entities.splice(i, 1);
+                i--;
+                entitiesCount--;
+            }
+        }
+
+        // for (let i = this.entities.length - 1; i >= 0; --i) {
+        //     if (this.entities[i].removeFromWorld) {
+        //         this.entities.splice(i, 1);
+        //     }
+        // }
     };
 
     loop(now) {

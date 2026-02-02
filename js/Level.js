@@ -132,7 +132,7 @@ export default class LevelManager {
         this.sceneEntities.forEach(function (entity) {
             engine.addEntity(entity);
         })
-        // this.reloadClock();
+        this.reloadClock();
     }
 
     //Initialize level 2

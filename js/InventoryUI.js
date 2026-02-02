@@ -21,9 +21,34 @@ export default class InventoryUI {
 
         this.backpackX = 10;
         this.backpackY = this.hotbarY - (this.slotSize * 2) - 20;
-        this.backpackCols = BACKPACK_COLS;
-        this.backpackRows = BACKPACK_ROWS;
+        this.backpackCols = Math.min(this.player.inventory.backpackSize, 5);
+        this.backpackRows = Math.ceil(this.player.inventory.backpackSize / this.backpackCols);
+        this.isHovered = false;
 
+    }
+
+    update(engine) {
+        if (engine.mouse) {
+            const x = engine.mouse.x / CONSTANTS.SCALE;
+            const y = engine.mouse.y / CONSTANTS.SCALE;
+            if (x >= this.backpackButtonX && x <= this.backpackButtonX + this.backpackButtonSize &&
+            y >= this.backpackButtonY && y <= this.backpackButtonY + this.backpackButtonSize) {
+                if (!this.isHovered) {
+                    this.isHovered = true;
+                    engine.setMouseSignal(1);
+                }
+            } else if (this.isHovered) {
+                this.isHovered = false;
+                engine.setMouseSignal(0);
+            }
+        }
+        if (engine.click) {
+            const clickedButton = this.handleBackpackClick(engine.click);
+            if (!clickedButton) {
+                this.handleSlotClick(engine.click);
+            }
+            engine.click = null;
+        }
     }
 
     handleBackpackClick(click) {

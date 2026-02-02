@@ -26,6 +26,13 @@ export default class OnScreenTextSystem extends Entity {
     changeText(newText) {
         this.text = newText;
     }
+    
+    update(engine) {
+        if (this.parent.removeFromWorld == true) {
+            this.removeFromWorld = true;
+            console.log("removing!")
+        }
+    }
 
     /**
      * @param {CanvasRenderingContext2D} ctx

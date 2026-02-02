@@ -6,12 +6,14 @@ import CollisionTester from "/js/CollisionTester.js";
 import InGameClock from "/js/InGameClock.js";
 import InventoryUI from "/js/InventoryUI.js";
 import { CONSTANTS } from "/js/Util.js";
+import Cursor from "/js/GeneralUtils/Cursor.js";
 
 const gameEngine = new GameEngine();
 
 const ASSET_MANAGER = new AssetManager();
 
 ASSET_MANAGER.queueDownload("/Assets/Player/IdleRun-Sheet.png")
+ASSET_MANAGER.queueDownload("/Assets/Player/Cursor-Sheet.png")
 ASSET_MANAGER.queueDownload("/Assets/WorldItems/grey-pot.png")
 ASSET_MANAGER.queueDownload("/Assets/WorldItems/PotatoPlant-Sheet.png")
 
@@ -22,7 +24,7 @@ ASSET_MANAGER.downloadAll(() => {
 	ctx.imageSmoothingEnabled = false;
     ctx.font = "12px monospace";
     ctx.scale(CONSTANTS.SCALE, CONSTANTS.SCALE);
-    // ctx.translate(CONSTANTS.CANVAS_WIDTH / 4, 0)
+    canvas.style.cursor = 'none';
     gameEngine.init(ctx);
 
     const player = new Player(48, 32);
@@ -34,14 +36,10 @@ ASSET_MANAGER.downloadAll(() => {
     gameEngine.setPlayer(player);
     gameEngine.setClock(new InGameClock())
     gameEngine.setLevel(new Level(gameEngine));
-    gameEngine.inventoryUI = inventoryUI;
-    gameEngine.addEntity(new CollisionTester());
-    // gameEngine.addEntity(new CropEntity(2 * 32, 8 * 32));
-    // gameEngine.addEntity(new CropEntity(5 * 32, 8 * 32));
-    // gameEngine.addEntity(new Interactable(4 * 32 - 16, 4 * 32 - 16, 64, 64, gameEngine));
-    // gameEngine.addEntity(new Interactable(1 * 32 - 16, 8 * 32 - 16, 64, 64, gameEngine));
-    // gameEngine.addEntity(new Teleporter(gameEngine, 4*tileSize, 8*tileSize, tileSize, tileSize, 1))
-    // gameEngine.addEntity(new Teleporter(gameEngine, 7*tileSize, 8*tileSize, tileSize, tileSize, 2))
+    // gameEngine.inventoryUI = inventoryUI;
+    gameEngine.addUIEntity(inventoryUI)
+    gameEngine.setCursor(new Cursor());
+    // gameEngine.addEntity(new CollisionTester());
     // ctx.translate(-CONSTANTS.CANVAS_WIDTH / 4, 0)
 
     gameEngine.start();
