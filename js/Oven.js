@@ -5,15 +5,22 @@ import Player from '/js/Player.js';
 import Item from '/js/Item.js';
 import { randomIntRange, CONSTANTS } from '/js/Util.js';
 
-export default class Interactable extends EntityInteractable {
+const idleColor = "#7393B3";
+const cookColor = "#36454F";
+const doneColor = "#8A9A5B";
+
+export default class Oven extends EntityInteractable {
     constructor(x, y, width, height, engine) {
         super();
         this.x = x;
         this.y = y;
         this.height = height;
         this.width = width;
-        this.color = "#c3ce94";
+        this.color = idleColor;
         this.toggleCooldown = 60; // 1 second cooldown
+        this.cookingTime = 300; // 5 second cooking time
+        this.elapsedCook = 0;
+        this.isCooking = false;
         this.elapsedTicks = 0;
         this.engine = engine;
 
@@ -21,13 +28,16 @@ export default class Interactable extends EntityInteractable {
 
         this.toggleState = false;
         this.prompt = new OnScreenTextSystem(this,
-            this.x + (width / 4), this.y - (height / 4), "Press E to Interact with Objects", false);
+            this.x + (width / 2), this.y - (height / 4), "Press E to Oven", false);
+        this.timer = new OnScreenTextSystem(this,this.x + (width / 2), this.y - (height / 4), "0:0" + Math.ceil((this.cookingTime - this.elapsedCook.toString(10) / 60), false));
         engine.addEntity(this.prompt);
+        engine.addEntity(this.timer);
     }
 
     /** @param {GameEngine} engine */
     update(engine) {
         if (this.toggleState == false) {
+            this.timer.hideText();
             for (const entity of engine.entities) {
                 if (entity instanceof Player) {
                     if (this.isCollidingWith(entity)) {
@@ -39,6 +49,11 @@ export default class Interactable extends EntityInteractable {
             }
         } else {
             this.prompt.hideText();
+            this.timer.showText();
+            this.updateTimer(this.timer);
+            if(this.isCooking == false) {
+                this.color = doneColor;
+            }
         }
         if (this.toggleable == false) {
             this.elapsedTicks += 1;
@@ -47,36 +62,59 @@ export default class Interactable extends EntityInteractable {
                 this.elapsedTicks = 0;
             }
         }
+        if (this.isCooking == true) {
+            this.elapsedCook += 1;
+            if (this.elapsedCook > this.cookingTime) {
+                this.isCooking = false;
+                this.elapsedCook = 0;
+            }
+        }
     }
 
     /** @param {Player} player */
     interact(player) {
-        if (this.toggleable == true) {
+        if (this.toggleable == true && this.isCooking == false) {
             this.toggleable = false;
             if (this.toggleState == true) {
                 this.unToggleEntity();
-            } else {
-                this.toggleEntity();
+        //when we have active slots we'll *try* and remove the active item. For now the stove is eating whatever is in slot one
+            } else if(player.inventory.removeItem(0) == true) {
+                this.toggleEntity(player);
+                this.isCooking = true;
+            }
+            else {
+                console.log("You can't cook air!");
             }
         }
     }
 
     toggleEntity() {
         this.toggleState = true;
-        this.color = "#7086f1";
-        console.log("Toggled!")
-        this.engine.addEntity(new Item(1, this.x + (this.width / 4), this.y - (this.height / 2), randomIntRange(10, -10), -5, 1))
+        this.color = cookColor;
+        console.log("Toggled!");
     }
 
     unToggleEntity() {
         this.toggleState = false;
-        this.color = "#c3ce94";
+        this.color = idleColor;
         console.log("UnToggled!")
+        this.engine.addEntity(new Item(2, this.x + (this.width / 4), this.y - (this.height / 2), randomIntRange(10, -10), -5, 3))
+    }
+
+    /** @param {OnScreenTextSystem} timer */
+    updateTimer(timer) {
+        if (this.isCooking == true) {
+        timer.changeText("0:0" + Math.ceil((this.cookingTime - this.elapsedCook).toString(10) / 60 ));
+        }
+        else {
+            console.log("done")
+            //do nothing
+        }
     }
 
     /**
      * @param {CanvasRenderingContext2D} ctx
-     * @param {GameEngine} enginea 
+     * @param {GameEngine} enginea
      */
     draw(ctx, engine) {
         // draw *something* if a subclass doesn't correctly draw anything

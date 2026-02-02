@@ -1,5 +1,6 @@
 /** @import GameEngine from "/js/GameEngine.js" */
 import WorldEntity from './AbstractClasses/WorldEntity.js';
+import { CONSTANTS } from '/js/Util.js';
 
 export default class CollisionTester extends WorldEntity {
     constructor() {
@@ -10,8 +11,8 @@ export default class CollisionTester extends WorldEntity {
 
     update(engine) {
         if (engine.mouse) {
-            this.x = engine.mouse.x;
-            this.y = engine.mouse.y;
+            this.x = engine.mouse.x / CONSTANTS.SCALE;
+            this.y = engine.mouse.y / CONSTANTS.SCALE;
         }
     }
 
@@ -20,7 +21,7 @@ export default class CollisionTester extends WorldEntity {
      * @param {GameEngine} engine
      */
     draw(ctx, engine) {
-        if (engine.getLevel().checkIfBoxCollides(this.x, this.y, this.width, this.height)) {
+        if (engine.getLevel().checkIfBoxCollides(this.x / CONSTANTS.SCALE, this.y / CONSTANTS.SCALE, this.width, this.height)) {
             ctx.fillStyle = "#00ff00";
         } else {
             ctx.fillStyle = "#0000ff";

@@ -2,6 +2,7 @@
 /** @import Level from "/js/Level.js" */
 /** @import Player from "/js/Player.js" */
 
+import InGameClock from "/js/InGameClock.js";
 import { CONSTANTS } from "/js/Util.js";
 
 const INPUT_MAP = {
@@ -75,11 +76,15 @@ export default class GameEngine {
             this.mouse = getXandY(e);
         });
 
-        this.ctx.canvas.addEventListener("click", e => {
+        this.ctx.canvas.addEventListener("mousedown", e => {
             if (this.options.debugging) {
                 console.log("CLICK", getXandY(e));
             }
             this.click = getXandY(e);
+        });
+
+        this.ctx.canvas.addEventListener("mouseup", e => {
+            this.click = null;
         });
 
         this.ctx.canvas.addEventListener("wheel", e => {
@@ -130,6 +135,17 @@ export default class GameEngine {
         return this.player
     }
 
+    // the in-game clock may also need to be accessed by many other entities who use logic that's virtually timed.
+    /** @param {InGameClock} clock */
+    setClock(clock) {
+        this.addEntity(clock);
+        this.clock = clock;
+    }
+
+    getClock() {
+        return this.clock;
+    }
+
     draw() {
         // Clear the whole canvas with transparent color (rgba(0, 0, 0, 0))
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
@@ -156,7 +172,11 @@ export default class GameEngine {
 
         // backpack
         if (this.click && this.inventoryUI) {
-            this.inventoryUI.handleBackpackClick(this.click);
+            const clickedButton = this.inventoryUI.handleBackpackClick(this.click);
+
+            if (!clickedButton) {
+                this.inventoryUI.handleSlotClick(this.click);
+            }
             this.click = null;
         }
 

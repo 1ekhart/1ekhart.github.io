@@ -1,5 +1,6 @@
 /** @import GameEngine from "/js/GameEngine.js" */
 import Entity from "/js/AbstractClasses/Entity.js";
+import { CONSTANTS } from "/js/Util.js";
 
 export default class OnScreenTextSystem extends Entity {
     constructor(parent, x, y, text, isOn) {
@@ -22,6 +23,10 @@ export default class OnScreenTextSystem extends Entity {
         this.isOn = false;
     }
 
+    changeText(newText) {
+        this.text = newText;
+    }
+
     /**
      * @param {CanvasRenderingContext2D} ctx
      * @param {GameEngine} engine
@@ -32,6 +37,7 @@ export default class OnScreenTextSystem extends Entity {
         }
         const width = ctx.measureText(this.text).width;
         ctx.fillStyle = "#000000"
-        ctx.fillText(this.text, this.x - (width/2), this.y);
+        ctx.font = `${12 * 1}px monospace`;
+        ctx.fillText(this.text, this.x - (width/2) - engine.camera.x, this.y - engine.camera.y);
     }
 }
