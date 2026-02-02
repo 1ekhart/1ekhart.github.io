@@ -30,7 +30,6 @@ export default class OnScreenTextSystem extends Entity {
     update(engine) {
         if (this.parent.removeFromWorld == true) {
             this.removeFromWorld = true;
-            console.log("removing!")
         }
     }
 
