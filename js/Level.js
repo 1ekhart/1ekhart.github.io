@@ -7,13 +7,12 @@ import Oven from "/js/Oven.js";
 import PrepStation from "/js/PrepStation.js";
 import CookingStation from "/js/CookingStation.js";
 import { CONSTANTS } from '/js/Util.js';
-import Animator from "/js/GeneralUtils/Animator.js";
-import Player from '/js/Player.js';
 import Button from '/js/AbstractClasses/Button.js';
 import InventoryUI from '/js/InventoryUI.js';
 import DialogueBox from '/js/GeneralUtils/DialogueBox.js';
 import { wipeSave } from '/js/GeneralUtils/SaveDataRetrieval.js';
 import MarketPlace from '/js/MarketPlace.js';
+import MovingEntity from '/js/MovingEntity.js';
 
 // size of a tile in screen pixels
 const TILE_SIZE = 32;
@@ -207,6 +206,7 @@ export default class LevelManager {
         this.sceneEntities.push(new PottedPlant(this.engine, 12 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE, TILE_SIZE, 3, this.engine.getClock().dayCount));
         this.sceneEntities.push(new PottedPlant(this.engine, 15 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE, TILE_SIZE, 3, this.engine.getClock().dayCount));
         this.sceneEntities.push(new MarketPlace(this.engine, 18 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE, TILE_SIZE))
+        this.sceneEntities.push(new MovingEntity(this.engine, 15 * TILE_SIZE, 8 * TILE_SIZE));
 
         const engine = this.engine;
         this.sceneEntities.forEach(function (entity) {

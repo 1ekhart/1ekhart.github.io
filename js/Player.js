@@ -2,6 +2,7 @@
 import WorldEntity from "/js/AbstractClasses/WorldEntity.js";
 import Animator from "/js/GeneralUtils/Animator.js";
 import Inventory from "/js/Inventory.js";
+import MovingEntity from "/js/MovingEntity.js";
 import { CONSTANTS, decreaseToZero } from "/js/Util.js";
 
 const floor = Math.floor;
@@ -58,6 +59,15 @@ export default class Player extends WorldEntity {
                     if (entity.interact) {
                         entity.interact(this);
                     }
+                }
+            }
+        }
+
+        if(engine.click) {
+            for(const entity of engine.entities[3]) {
+                if(entity instanceof MovingEntity && this.isCollidingWith(entity)) {
+                    entity.onAttack(this);
+                    engine.click = null; // consume the click if the attack landed
                 }
             }
         }
