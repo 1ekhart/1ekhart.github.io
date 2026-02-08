@@ -19,7 +19,6 @@ export default class Cursor {
     }
 
     draw(ctx, engine) {
-        console.log("Hi")
         if (engine.mouse) {
             this.mouseSprites.drawFramePlain(ctx, this.x, this.y, 1, this.spriteNum);
             if (CONSTANTS.DEBUG) {

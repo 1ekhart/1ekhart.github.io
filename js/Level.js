@@ -7,6 +7,12 @@ import Oven from "/js/Oven.js";
 import PrepStation from "/js/PrepStation.js";
 import CookingStation from "/js/CookingStation.js";
 import { CONSTANTS } from '/js/Util.js';
+import Player from '/js/Player.js';
+import Button from '/js/AbstractClasses/Button.js';
+import InventoryUI from '/js/InventoryUI.js';
+import DialogueBox from '/js/GeneralUtils/DialogueBox.js';
+import { wipeSave } from '/js/GeneralUtils/SaveDataRetrieval.js';
+import MarketPlace from '/js/MarketPlace.js';
 
 // size of a tile in screen pixels
 const TILE_SIZE = 32;
@@ -88,6 +94,8 @@ const level3 = [
 
 ]
 
+
+const INTERACTABLE_OBJECT_LAYER = 3;
 export default class LevelManager {
     constructor(engine) {
         this.toggleCooldown = 1;
@@ -95,16 +103,82 @@ export default class LevelManager {
         this.engine = engine;
         this.elapsedTime = 0;
         this.sceneEntities =  [];
-        this.loadLevel1();
+        this.menu = true;
+        this.data = [];
+        // initialize player data
         this.player = engine.getPlayer();
-        this.player.x = 1 * TILE_SIZE;
-        this.player.y = 1 * TILE_SIZE;
-        this.x = this.player.x;
-        this.y = this.player.y;
-        this.reloadClock();
-
+        this.player.x = -50;
+        this.player.y = -50;
+        this.x = 0;
+        this.y = 0;
+        this.loadMainMenu();
         //  keeps track of entities so we can load or destroy all of the entities in a particular scene.
+    }
 
+    loadMainMenu() {
+        const canvas = document.getElementById("gameWorld");
+        const ctx = canvas.getContext("2d");
+
+        //initialize the button areas and the UI elements
+        const menuButtonWidth = 3*TILE_SIZE;
+        const menuButtonHeight = 1*TILE_SIZE;
+        const centerX = CONSTANTS.CANVAS_WIDTH / (2 * CONSTANTS.SCALE)
+        const centerY = CONSTANTS.CANVAS_HEIGHT / (2 * CONSTANTS.SCALE);
+        this.menuButtons = [];
+
+        //initialize callback functions and other functions
+        const that = this;
+        const discardMenuUI = () => {
+            that.menuButtons.forEach(function (entity) {
+                entity.removeFromWorld = true;
+            })
+        };
+
+        const startLevelFunc = () => { //starts the level;
+            that.menu = false;
+            discardMenuUI();
+            this.engine.setClock(new InGameClock());
+            that.engine.addUIEntity(new InventoryUI(this.player, ctx));
+            that.engine.addUIEntity(new DialogueBox(that.engine, "Hello this is a dialogue box and You can close these by clicking the 'close' button."));
+            that.teleport(1, 2, 2);
+        }
+
+        const levelSelect = () => { // selets what save you want to pick, new or old
+            discardMenuUI();
+            that.menuButtons.push(new Button(centerX - (menuButtonWidth / 2), centerY, menuButtonWidth, menuButtonHeight,
+            startLevelFunc, "Load Game", "#81c2f3", "#040404"));
+            that.menuButtons.push(new Button(centerX - (menuButtonWidth / 2), centerY + menuButtonHeight + 5, menuButtonWidth, menuButtonHeight,
+            newGameWarning, "New Game", "#81c2f3", "#040404"))
+            addMenuUIEntities();
+        }
+
+        const wipeSaveData = () => { // wipes the save and starts a new game
+            wipeSave();
+            startLevelFunc();
+        }
+
+        const newGameWarning = () => {
+            discardMenuUI();
+            that.menuButtons.push(new DialogueBox(that.engine, "If you have already saved data, this will be overwritten. Do you want to start a new game?", true));
+            that.menuButtons.push(new Button(centerX - (menuButtonWidth / 2), centerY, menuButtonWidth, menuButtonHeight,
+            wipeSaveData, "New Game", "#81c2f3", "#040404"));
+            that.menuButtons.push(new Button(centerX - (menuButtonWidth / 2), centerY + menuButtonHeight + 5, menuButtonWidth, menuButtonHeight,
+            levelSelect, "Back", "#81c2f3", "#040404"));
+            addMenuUIEntities();
+        }
+
+        // this.engine.getClock().stopTime();
+        // this.menuButtons.push(new InventoryUI(this.player, ctx));
+        this.menuButtons.push(new Button(centerX - (menuButtonWidth/2), centerY, menuButtonWidth, menuButtonHeight,
+            levelSelect, "Start", "#81c2f3", "#040404"))
+        const engine = this.engine;
+
+        const addMenuUIEntities = () => {
+            that.menuButtons.forEach(function (entity) {
+            engine.addUIEntity(entity);
+        })
+        }
+        addMenuUIEntities();
     }
 
     //Initialize level 1;
@@ -123,12 +197,12 @@ export default class LevelManager {
         this.sceneEntities.push(new Teleporter(this.engine, 10*TILE_SIZE, 8*TILE_SIZE, TILE_SIZE, TILE_SIZE, 3));
         this.sceneEntities.push(new PottedPlant(this.engine, 12 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE, TILE_SIZE, 3, this.engine.getClock().dayCount));
         this.sceneEntities.push(new PottedPlant(this.engine, 15 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE, TILE_SIZE, 3, this.engine.getClock().dayCount));
+        this.sceneEntities.push(new MarketPlace(this.engine, 18 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE, TILE_SIZE))
 
         const engine = this.engine;
         this.sceneEntities.forEach(function (entity) {
-            engine.addEntity(entity);
+            engine.addEntity(entity, INTERACTABLE_OBJECT_LAYER);
         })
-        this.reloadClock();
     }
 
     //Initialize level 2
@@ -143,9 +217,8 @@ export default class LevelManager {
 
         const engine = this.engine;
         this.sceneEntities.forEach(function (entity) {
-            engine.addEntity(entity);
+            engine.addEntity(entity, INTERACTABLE_OBJECT_LAYER);
         })
-        this.reloadClock();
     }
 
     loadLevel3() {
@@ -162,9 +235,8 @@ export default class LevelManager {
 
         const engine = this.engine;
         this.sceneEntities.forEach(function (entity) {
-            engine.addEntity(entity);
+            engine.addEntity(entity, INTERACTABLE_OBJECT_LAYER);
         })
-        this.reloadClock();
     }
 
     reloadClock() {
@@ -174,7 +246,15 @@ export default class LevelManager {
         this.engine.setClock(clock);
     }
 
-    teleport(level, x, y) {
+    // reloadPlayer() {
+    //     const player = this.engine.getPlayer();
+    //     this.engine.setPlayer(new Player(64, 64));
+    //     // this.engine.getPlayer().removeFromWorld = true;
+    //     // this.engine.setPlayer(player);
+    //     this.player = this.engine.getPlayer();
+    // }
+
+    teleport(level, x, y) { // use to initialize levels and player position
         if (level === 1) {
             this.loadLevel1();
         } else if (level === 2) {
@@ -182,7 +262,15 @@ export default class LevelManager {
         } else if (level === 3) {
             this.loadLevel3();
         }
-
+        // this.reloadClock();
+        const that = this;
+        var player;
+        this.engine.entities[4].forEach(function (entity){
+            if (that.player === entity) player = true;
+        })
+        if (!this.player) {
+            this.engine.setPlayer(player);
+        }
         this.player.x = x * TILE_SIZE;
         this.player.y = y * TILE_SIZE;
     }
@@ -190,6 +278,9 @@ export default class LevelManager {
     //Handling level transitions and player movement
     update(engine) {
         // update the camera to fit player coordinates and stay centered.
+        if (this.menu) {
+            return;
+        }
         let relPlayerX = this.player.x + this.player.width / (2 * CONSTANTS.SCALE) - CAMERA_OFFSET_X;
         let relplayerY = this.player.y + this.player.height / (2 * CONSTANTS.SCALE) - CAMERA_OFFSET_Y;
 
