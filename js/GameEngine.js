@@ -42,7 +42,7 @@ export default class GameEngine {
         for (let i = 0; i < ENTITY_LAYER_COUNT; i++) {
             this.entities.push([])
         }
-        
+
 
         // Information on the input
         this.click = null;
@@ -101,7 +101,7 @@ export default class GameEngine {
             if (this.options.debugging) {
                 console.log("WHEEL", getXandY(e), e.wheelDelta);
             }
-            // e.preventDefault(); // Prevent Scrolling
+            e.preventDefault(); // Prevent Scrolling
             this.wheel = e;
         });
 
@@ -115,14 +115,15 @@ export default class GameEngine {
 
         this.ctx.canvas.addEventListener("keydown", event => {
             this.input[INPUT_MAP[event.code]] = true;
+            event.preventDefault();
         });
         this.ctx.canvas.addEventListener("keyup", event => {
             this.input[INPUT_MAP[event.code]] = false;
+            event.preventDefault();
         });
     };
 
 
-    // the Level is a special entity that many other entities will need to access directly
     /** @param {Number} layer the layer of the entity 0-7, higher layers get rendered to the front, and layers exceeding 7 default to layer 7, 3 by default*/
     /** @param {*} entity the entity to be added, must have a draw() or update() method */
     addEntity(entity, layer) {
@@ -212,15 +213,6 @@ export default class GameEngine {
                 entity.draw(this.ctx, this);
             }
         }
-
-        // June Note: Commented out because I moved inventoryUI to the UI entities array.
-        // if (this.inventoryUI) {
-        //     this.inventoryUI.draw();
-        // }
-
-        // for (const entity of this.UIEntities) {
-        //     entity.draw(this.ctx, this);
-        // }
     };
 
     update() {
@@ -235,7 +227,6 @@ export default class GameEngine {
             }
 
             let entityColumns = entityLayer.length;
-            const that = this;
 
             //iterate through an individual layer
             for (let j = 0; j < entityColumns; j++) {
@@ -262,8 +253,8 @@ export default class GameEngine {
         //     }
         //     this.click = null;
         // }
-        
-        // 
+
+        //
         // let UIEntitiesLength = this.UIEntities.length;
 
         // for (let i = 0; i < UIEntitiesLength; i++) {

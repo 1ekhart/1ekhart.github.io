@@ -7,12 +7,12 @@ import Oven from "/js/Oven.js";
 import PrepStation from "/js/PrepStation.js";
 import CookingStation from "/js/CookingStation.js";
 import { CONSTANTS } from '/js/Util.js';
-import Player from '/js/Player.js';
 import Button from '/js/AbstractClasses/Button.js';
 import InventoryUI from '/js/InventoryUI.js';
 import DialogueBox from '/js/GeneralUtils/DialogueBox.js';
 import { wipeSave } from '/js/GeneralUtils/SaveDataRetrieval.js';
 import MarketPlace from '/js/MarketPlace.js';
+import MovingEntity from '/js/MovingEntity.js';
 
 // size of a tile in screen pixels
 const TILE_SIZE = 32;
@@ -34,6 +34,14 @@ const tileColors = [
     "#444444",
     "#b3874e",
     "#6aa84f"
+];
+
+const tileTextures = [
+    "nothing",
+    "/Assets/WorldTiles/Wood_(placed).webp",
+    "nothing",
+    "nothing",
+    "/Assets/WorldTiles/GrassSheet.png"
 ];
 
 const level1 = [
@@ -198,6 +206,7 @@ export default class LevelManager {
         this.sceneEntities.push(new PottedPlant(this.engine, 12 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE, TILE_SIZE, 3, this.engine.getClock().dayCount));
         this.sceneEntities.push(new PottedPlant(this.engine, 15 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE, TILE_SIZE, 3, this.engine.getClock().dayCount));
         this.sceneEntities.push(new MarketPlace(this.engine, 18 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE, TILE_SIZE))
+        this.sceneEntities.push(new MovingEntity(this.engine, 15 * TILE_SIZE, 8 * TILE_SIZE));
 
         const engine = this.engine;
         this.sceneEntities.forEach(function (entity) {
@@ -246,14 +255,6 @@ export default class LevelManager {
         this.engine.setClock(clock);
     }
 
-    // reloadPlayer() {
-    //     const player = this.engine.getPlayer();
-    //     this.engine.setPlayer(new Player(64, 64));
-    //     // this.engine.getPlayer().removeFromWorld = true;
-    //     // this.engine.setPlayer(player);
-    //     this.player = this.engine.getPlayer();
-    // }
-
     teleport(level, x, y) { // use to initialize levels and player position
         if (level === 1) {
             this.loadLevel1();
@@ -262,7 +263,6 @@ export default class LevelManager {
         } else if (level === 3) {
             this.loadLevel3();
         }
-        // this.reloadClock();
         const that = this;
         var player;
         this.engine.entities[4].forEach(function (entity){
@@ -347,9 +347,77 @@ export default class LevelManager {
             for (let column = 0; column < rowDataLength; column++) {
                 const tile = rowData[column];
                 if (tile > 0) {
-                    // temporary box graphics for tiles
+                    const asset = ASSET_MANAGER.getAsset(tileTextures[tile]);
+                    // temporary box graphics for tiles WILL ITERATE THROUGH TILE 4 CODE ONCE EACH TILE HAS A SHEET
+                    if (tile == 1) {
+                        ctx.drawImage(asset, column * TILE_SIZE - this.x, row * TILE_SIZE - this.y, TILE_SIZE + .5, TILE_SIZE + .5);
+                    }
+                    else if (tile == 4) {
+                        //If true then we use the top open pieces
+                        if (row == 0 || data[row -1][column] == 0) {
+                            if(column == 0 || data[row][column - 1] == 0 ) {
+                                ctx.drawImage(asset, 0, 0, 16, 16, column * TILE_SIZE - this.x, row * TILE_SIZE - this.y,TILE_SIZE/2 + 1, TILE_SIZE/2 + 1 )
+                            }
+                            else {
+                                ctx.drawImage(asset, 18, 0, 16, 16, column * TILE_SIZE - this.x, row * TILE_SIZE - this.y,TILE_SIZE/2 + 1, TILE_SIZE/2 + 1)
+                            }
+                            if(column == rowDataLength - 1 || data[row][column + 1] == 0) {
+                                ctx.drawImage(asset, 0, 18, 16, 16, column * TILE_SIZE - this.x + 16, row * TILE_SIZE - this.y,TILE_SIZE/2 + 1, TILE_SIZE/2 + 1)
+                            }
+                            else {
+                                ctx.drawImage(asset, 18, 18, 16, 16, column * TILE_SIZE - this.x + 16, row * TILE_SIZE - this.y,TILE_SIZE/2 + 1, TILE_SIZE/2 + 1)
+                            }
+                        }
+                        //Closed top pieces
+                        else {
+                            if(column == 0 || data[row][column -1] == 0) {
+                                ctx.drawImage(asset, 36, 0, 16, 16, column * TILE_SIZE - this.x, row * TILE_SIZE - this.y,TILE_SIZE/2 + 1, TILE_SIZE/2 + 1 )
+                            }
+                            else {
+                                ctx.drawImage(asset, 54, 0, 16, 16, column * TILE_SIZE - this.x, row * TILE_SIZE - this.y,TILE_SIZE/2 + 1, TILE_SIZE/2 + 1 )
+                            }
+                            if(column == rowDataLength - 1 || data[row][column + 1] == 0) {
+                                ctx.drawImage(asset, 36, 18, 16, 16, column * TILE_SIZE - this.x + 16, row * TILE_SIZE - this.y,TILE_SIZE/2 + 1, TILE_SIZE/2 + 1 )
+                            }
+                            else {
+                                ctx.drawImage(asset, 54, 18, 16, 16, column * TILE_SIZE - this.x + 16, row * TILE_SIZE - this.y,TILE_SIZE/2 + 1, TILE_SIZE/2 + 1 )
+                            }
+                        }
+                        //If true then we use the bottom open pieces
+                        if (row == dataLength - 1 || data[row + 1][column] == 0) {
+                            if(column == 0 || data[row][column - 1] == 0 ) {
+                                ctx.drawImage(asset, 0, 36, 16, 16, column * TILE_SIZE - this.x, row * TILE_SIZE - this.y + 16,TILE_SIZE/2 + 1, TILE_SIZE/2 + 1 )
+                            }
+                            else {
+                                ctx.drawImage(asset, 18, 36, 16, 16, column * TILE_SIZE - this.x, row * TILE_SIZE - this.y + 16,TILE_SIZE/2 + 1, TILE_SIZE/2 + 1)
+                            }
+                            if(column == rowDataLength - 1  || data[row][column + 1] == 0) {
+                                ctx.drawImage(asset, 0, 54, 16, 16, column * TILE_SIZE - this.x + 16, row * TILE_SIZE - this.y + 16,TILE_SIZE/2 + 1, TILE_SIZE/2 + 1)
+                            }
+                            else {
+                                ctx.drawImage(asset, 18, 54, 16, 16, column * TILE_SIZE - this.x + 16, row * TILE_SIZE - this.y + 16,TILE_SIZE/2 + 1, TILE_SIZE/2 + 1)
+                            }
+                        }
+                        //Closed bottom pieces
+                        else {
+                            if(column == 0 || data[row][column - 1] == 0) {
+                                ctx.drawImage(asset, 36, 36, 16, 16, column * TILE_SIZE - this.x, row * TILE_SIZE - this.y + 16,TILE_SIZE/2 + 1, TILE_SIZE/2 + 1 )
+                            }
+                            else {
+                                ctx.drawImage(asset, 54, 36, 16, 16, column * TILE_SIZE - this.x, row * TILE_SIZE - this.y + 16,TILE_SIZE/2 + 1, TILE_SIZE/2 + 1 )
+                            }
+                            if(column == rowDataLength - 1 || data[row][column + 1] == 0) {
+                                ctx.drawImage(asset, 36, 54, 16, 16, column * TILE_SIZE - this.x + 16, row * TILE_SIZE - this.y + 16,TILE_SIZE/2 + 1, TILE_SIZE/2 + 1 )
+                            }
+                            else {
+                                ctx.drawImage(asset, 54, 54, 16, 16, column * TILE_SIZE - this.x + 16, row * TILE_SIZE - this.y + 16,TILE_SIZE/2 + 1, TILE_SIZE/2 + 1 )
+                            }
+                        }
+                }
+                else {
                     ctx.fillStyle = tileColors[tile];
-                    ctx.fillRect(column * TILE_SIZE - this.x, row * TILE_SIZE - this.y, TILE_SIZE, TILE_SIZE);
+                    ctx.fillRect(column * TILE_SIZE - this.x, row * TILE_SIZE - this.y, TILE_SIZE + 1, TILE_SIZE + 1);
+                }
                 }
             }
         }

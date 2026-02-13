@@ -16,7 +16,10 @@ ASSET_MANAGER.queueDownload("/Assets/Player/IdleRun-Sheet.png")
 ASSET_MANAGER.queueDownload("/Assets/Player/Cursor-Sheet.png")
 ASSET_MANAGER.queueDownload("/Assets/WorldItems/grey-pot.png")
 ASSET_MANAGER.queueDownload("/Assets/WorldItems/PotatoPlant-Sheet.png")
+ASSET_MANAGER.queueDownload("/Assets/WorldTiles/Wood_(placed).webp")
+ASSET_MANAGER.queueDownload("/Assets/WorldTiles/GrassSheet.png")
 ASSET_MANAGER.queueDownload("/Assets/Icons/PotatoIcon.png")
+
 
 
 /**
@@ -26,7 +29,7 @@ ASSET_MANAGER.queueDownload("/Assets/Icons/PotatoIcon.png")
  * layer 6 is for game-logic elements that may or may not have UI, like the clock.
  * layer 5 is for foreground elements
  * layer 4 is where most elements may be placed like the player
- * layer 3 can have different elements that we may want in front of background or level layer elements but behind the player. 
+ * layer 3 can have different elements that we may want in front of background or level layer elements but behind the player.
  * layer 3 may have Enemies and Interactable objects here
  * The level manager and level is placed into layer 2
  * Layer 0-1 can be backgrounds

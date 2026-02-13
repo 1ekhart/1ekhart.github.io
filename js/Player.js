@@ -2,6 +2,7 @@
 import WorldEntity from "/js/AbstractClasses/WorldEntity.js";
 import Animator from "/js/GeneralUtils/Animator.js";
 import Inventory from "/js/Inventory.js";
+import MovingEntity from "/js/MovingEntity.js";
 import { CONSTANTS, decreaseToZero } from "/js/Util.js";
 
 const floor = Math.floor;
@@ -61,6 +62,15 @@ export default class Player extends WorldEntity {
                 }
             }
         }
+
+        if(engine.click) {
+            for(const entity of engine.entities[3]) {
+                if(entity instanceof MovingEntity && this.isCollidingWith(entity)) {
+                    entity.onAttack(this);
+                    engine.click = null; // consume the click if the attack landed
+                }
+            }
+        }
     }
 
     /** @param {GameEngine} engine */
@@ -80,9 +90,8 @@ export default class Player extends WorldEntity {
                 this.yVelocity = JUMPING_STRENGTH;
             }
         } else {
-                this.xVelocity = decreaseToZero(this.xVelocity, GRAVITY / 2); // deceleration with no inputs held
+            this.xVelocity = decreaseToZero(this.xVelocity, GRAVITY / 2); // deceleration with no inputs held
         }
-        
 
         if (this.haltMovement == false) {
             if (engine.click) {
@@ -97,7 +106,7 @@ export default class Player extends WorldEntity {
             } else {
                 this.setAnimationState("Idle");
             }
-        } 
+        }
 
         // gravity
         if (engine.input.jump && this.yVelocity < 0) {
@@ -106,7 +115,7 @@ export default class Player extends WorldEntity {
             this.yVelocity += (GRAVITY * 1.5);
         } else {
             this.yVelocity += GRAVITY;
-        }    
+        }
 
         // collision
         this.moveColliding(engine);
@@ -118,7 +127,7 @@ export default class Player extends WorldEntity {
      */
     draw(ctx, engine) {
         if (this.haltMovement === true && this.animations[this.animationState].isDone()) {this.goDefaultState();}
-        
+
         this.animations[this.animationState].drawFrame(CONSTANTS.TICK_TIME, ctx,
             (this.x - (20)) - engine.camera.x, floor(this.y) - (this.height) + (32) - floor(engine.camera.y),
              !this.isRight, 2)
