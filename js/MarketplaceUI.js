@@ -82,7 +82,6 @@ export default class MarketPlaceUI extends Entity {
             } 
         } 
 
-        console.log("added sale button")
         const doNothing = () => {};
         const newButton = new Button(x, this.y + this.buttonHeight + (columnIndex * this.buttonHeight),
         this.buttonWidth, this.buttonHeight, doNothing, "Empty", "#9093a1f2", "#1a1a1aec", "#9093a18d");
@@ -97,7 +96,8 @@ export default class MarketPlaceUI extends Entity {
         ctx.fill();
 
         ctx.fillStyle = "#000000"
-        ctx.fillText(this.text,  this.x + (this.width / 2), this.y + (this.height / 8));
+        const width = ctx.measureText(this.text).width;
+        ctx.fillText(this.text,  this.x + (this.width / 2) - (width / 2), this.y + (this.height / 10));
 
     }
 }

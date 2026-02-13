@@ -23,6 +23,15 @@ const itemList = {
     3: Potato
 }
 
+const itemListNames = {
+    Pot: Pot,
+    Potato: Potato,
+}
+
 export const getItemData = (itemID) => {
     return itemList[itemID];
+}
+
+export const getItemByName = (itemName) => {
+    return itemListNames[itemName];
 }

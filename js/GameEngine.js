@@ -131,8 +131,8 @@ export default class GameEngine {
             row = 4;
         } else {
             row = layer;
-            if (layer >= ENTITY_LAYER_COUNT) {
-                row = ENTITY_LAYER_COUNT - 1;
+            if (layer > ENTITY_LAYER_COUNT) {
+                row = ENTITY_LAYER_COUNT - 2;
             }
         }
         if (entity instanceof EntityInteractable) {
