@@ -35,7 +35,7 @@ export default class MovingEntity extends WorldEntity {
         if(this.health <= 0) {
             this.remove()
             this.engine.addEntity(new Item(
-                0, // TODO: correct item type
+                2, // TODO: correct item type
                 this.x + 20, this.y,
                 0, -4,
                 4
