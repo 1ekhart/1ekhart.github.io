@@ -66,6 +66,10 @@ export default class Inventory {
 
         if (slot.quantity <= 0) {
             this.slots[slotIndex] = null;
+            // unequip empty slot
+            if (this.equippedSlot === slotIndex) {
+                this.equippedSlot = null;
+            }
         }
         return true;
     }

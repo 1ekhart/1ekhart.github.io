@@ -14,6 +14,7 @@ import DialogueBox from '/js/GeneralUtils/DialogueBox.js';
 import { wipeSave } from '/js/GeneralUtils/SaveDataRetrieval.js';
 import MarketPlace from '/js/MarketPlace.js';
 import MovingEntity from '/js/MovingEntity.js';
+import CustomerManager from '/js/CustomerManager.js';
 
 // size of a tile in screen pixels
 const TILE_SIZE = 32;
@@ -122,6 +123,13 @@ export default class LevelManager {
         this.y = 0;
         this.loadMainMenu();
         //  keeps track of entities so we can load or destroy all of the entities in a particular scene.
+
+        this.customerSpots = [
+            { x: 21 * TILE_SIZE, y: 8 * TILE_SIZE },
+            { x: 22 * TILE_SIZE, y: 8 * TILE_SIZE }
+        ];
+
+        this.customerManager = new CustomerManager(this.engine, this.customerSpots);
     }
 
     loadMainMenu() {
@@ -209,10 +217,9 @@ export default class LevelManager {
         this.sceneEntities.push(new PottedPlant(this.engine, 12 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE, TILE_SIZE, 3, this.engine.getClock().dayCount));
         this.sceneEntities.push(new PottedPlant(this.engine, 15 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE, TILE_SIZE, 3, this.engine.getClock().dayCount));
 
-        const testOrder = RECIPES.Burger;
-
-        this.sceneEntities.push(new Customer(21 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE / 2, TILE_SIZE, testOrder, this.engine));
-        this.sceneEntities.push(new Customer(22 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE / 2, TILE_SIZE, testOrder, this.engine));
+        //this.sceneEntities.push(new Customer(21 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE / 2, TILE_SIZE, testOrder, this.engine));
+        //this.sceneEntities.push(new Customer(22 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE / 2, TILE_SIZE, testOrder, this.engine));
+        
         this.sceneEntities.push(new MarketPlace(this.engine, 18 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE, TILE_SIZE))
         this.sceneEntities.push(new MovingEntity(this.engine, 15 * TILE_SIZE, 8 * TILE_SIZE));
 
@@ -220,10 +227,14 @@ export default class LevelManager {
         this.sceneEntities.forEach(function (entity) {
             engine.addEntity(entity, INTERACTABLE_OBJECT_LAYER);
         })
+
+        this.customerManager.setActive(true);
     }
 
     //Initialize level 2
     loadLevel2() {
+        this.customerManager.setActive(false);
+
         this.sceneEntities.forEach(function (entity) {
             entity.removeFromWorld = true;
         })
@@ -239,6 +250,8 @@ export default class LevelManager {
     }
 
     loadLevel3() {
+        this.customerManager.setActive(false);
+
         this.sceneEntities.forEach(function (entity) {
             entity.removeFromWorld = true;
         })
@@ -314,6 +327,8 @@ export default class LevelManager {
         } else if (this.y > lowOffsetY) {
             this.y = lowOffsetY;
         }
+
+        this.customerManager.update();
     }
 
     getTile(tileX, tileY) {

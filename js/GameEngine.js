@@ -59,6 +59,8 @@ export default class GameEngine {
         this.stationManager = new CookingStationManager();
         this.stationManager.createStation("1");
         this.stationManager.createStation("2");
+
+        this.customerManager = null;
     };
 
     /** @param {CanvasRenderingContext2D} ctx */
@@ -252,6 +254,10 @@ export default class GameEngine {
         }
         this.mouseDown = null;
         this.mouseUp = null;
+
+        if (this.customerManager) {
+            this.customerManager.update();
+        }
 
         //
         // let UIEntitiesLength = this.UIEntities.length;
