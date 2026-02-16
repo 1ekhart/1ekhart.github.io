@@ -41,13 +41,13 @@ export default class DialogueBox extends Entity {
         for (let i = 0; i < words.length; i++) {
             let sampleLine = line + words[i] + " ";
             if (ctx.measureText(sampleLine).width > this.width - (this.width / 9)) {
-                lines.push(line);
+                lines.push(line.slice(0, -1));
                 line = words[i] + ' ';
             } else {
                 line = sampleLine;
             }
         }
-        lines.push(line);
+        lines.push(line.slice(0, -1));
         this.lines = lines;
 
         const txtMetrics = ctx.measureText(text)
@@ -65,7 +65,7 @@ export default class DialogueBox extends Entity {
         ctx.strokeStyle = "#000000c0"
         ctx.fillStyle = "#ffffffcb"
         ctx.lineWidth = 1 * CONSTANTS.SCALE;
-        let textX = this.x + (this.width / 18);
+        let textX = this.x + (this.width / 36);
         let textY = this.y + (this.height / 8);
         for (let i = 0; i < this.lines.length; i++) {
             ctx.strokeText(this.lines[i], textX, textY)

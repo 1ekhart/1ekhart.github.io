@@ -14,6 +14,7 @@ import { wipeSave } from '/js/GeneralUtils/SaveDataRetrieval.js';
 import MarketPlace from '/js/MarketPlace.js';
 import MovingEntity from '/js/MovingEntity.js';
 import Player from './Player.js';
+import StationPlaceholder from '/js/StationPlaceholder.js';
 
 // size of a tile in screen pixels
 const TILE_SIZE = 32;
@@ -212,6 +213,7 @@ export default class LevelManager {
         this.sceneEntities.push(new PottedPlant(this.engine, 15 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE, TILE_SIZE, 3, this.engine.getClock().dayCount));
         this.sceneEntities.push(new MarketPlace(this.engine, 18 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE, TILE_SIZE))
         this.sceneEntities.push(new MovingEntity(this.engine, 15 * TILE_SIZE, 8 * TILE_SIZE));
+        this.sceneEntities.push(new StationPlaceholder(this.engine, 6*TILE_SIZE, 4*TILE_SIZE, TILE_SIZE, TILE_SIZE));
 
         const engine = this.engine;
         this.sceneEntities.forEach(function (entity) {

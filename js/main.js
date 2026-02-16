@@ -12,13 +12,28 @@ const gameEngine = new GameEngine();
 
 const ASSET_MANAGER = new AssetManager();
 
+//download from player folder
 ASSET_MANAGER.queueDownload("/Assets/Player/IdleRun-Sheet.png")
 ASSET_MANAGER.queueDownload("/Assets/Player/Cursor-Sheet.png")
+
+//download from world items folder
 ASSET_MANAGER.queueDownload("/Assets/WorldItems/grey-pot.png")
 ASSET_MANAGER.queueDownload("/Assets/WorldItems/PotatoPlant-Sheet.png")
+
+//download from world tiles folder
 ASSET_MANAGER.queueDownload("/Assets/WorldTiles/Wood_(placed).webp")
 ASSET_MANAGER.queueDownload("/Assets/WorldTiles/GrassSheet.png")
+
+//download from icons folder
 ASSET_MANAGER.queueDownload("/Assets/Icons/PotatoIcon.png")
+ASSET_MANAGER.queueDownload("/Assets/Icons/Rice.png")
+ASSET_MANAGER.queueDownload("/Assets/Icons/RiceBowl.png")
+ASSET_MANAGER.queueDownload("/Assets/Icons/CabbageIcon.png")
+ASSET_MANAGER.queueDownload("/Assets/Icons/Flour.png")
+ASSET_MANAGER.queueDownload("/Assets/Icons/BoarMeat.png")
+ASSET_MANAGER.queueDownload("/Assets/Icons/Coin.png")
+
+
 
 
 

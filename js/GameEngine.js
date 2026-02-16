@@ -81,23 +81,20 @@ export default class GameEngine {
             y: e.clientY - this.ctx.canvas.getBoundingClientRect().top
         });
 
-        this.ctx.canvas.addEventListener("mousemove", e => {
-            if (this.options.debugging) {
-                console.log("MOUSE_MOVE", getXandY(e));
-            }
-            this.mouse = getXandY(e);
-        });
-
-        this.ctx.canvas.addEventListener("mousedown", e => {
-            if (this.options.debugging) {
-                console.log("CLICK", getXandY(e));
-            }
-            this.click = getXandY(e);
+         this.ctx.canvas.addEventListener("mousedown", e => {
+            const pos = getXandY(e);
+            this.click = pos;
+            this.mouseDown = pos;
         });
 
         this.ctx.canvas.addEventListener("mouseup", e => {
+            this.mouseUp = getXandY(e);
             this.click = null;
         });
+
+        this.ctx.canvas.addEventListener("mousemove", e => {
+            this.mouse = getXandY(e);
+        })
 
         this.ctx.canvas.addEventListener("wheel", e => {
             if (this.options.debugging) {
@@ -243,45 +240,16 @@ export default class GameEngine {
                 if (!entity.removeFromWorld) {
                     entity.update(this);
                 } else { // small change to remove elements without re-iterating through the entity list
-                    // console.log("Just destroyed " + entity.constructor.name)
+                    if (CONSTANTS.DEBUG) {
+                        console.log("Just destroyed " + entity.constructor.name)
+                    }
+                
                     entityLayer.splice(j, 1);
                     j--;
                     entityColumns--;
                 }
             }
         }
-
-        // June Note: My code doesn't has the backpack as a plain entity so this is commented out and handled in the update() for inventoryUI
-        // // backpack
-        // if (this.click && this.inventoryUI) {
-        //     const clickedButton = this.inventoryUI.handleBackpackClick(this.click);
-
-        //     if (!clickedButton) {
-        //         this.inventoryUI.handleSlotClick(this.click);
-        //     }
-        //     this.click = null;
-        // }
-
-        //
-        // let UIEntitiesLength = this.UIEntities.length;
-
-        // for (let i = 0; i < UIEntitiesLength; i++) {
-        //     let entity = this.UIEntities[i];
-
-        //     if (!entity.removeFromWorld) {
-        //         entity.update(this);
-        //     } else { // small change to remove elements without re-iterating through the entity list
-        //         this.UIEntities.splice(i, 1);
-        //         i--;
-        //         UIEntitiesLength--;
-        //     }
-        // }
-
-        // for (let i = this.entities.length - 1; i >= 0; --i) {
-        //     if (this.entities[i].removeFromWorld) {
-        //         this.entities.splice(i, 1);
-        //     }
-        // }
     };
 
     loop(now) {

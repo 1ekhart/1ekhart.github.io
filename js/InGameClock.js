@@ -4,7 +4,7 @@ import { appendSaveData, getSave } from "/js/GeneralUtils/SaveDataRetrieval.js";
 import { CONSTANTS } from "/js/Util.js";
 
 // how many seconds each day will last. Each day is 24 hours, so the hour length will be DAY_LENGTH / 24 and minutes  will be 60/hour length
-const DAY_LENGTH = 10; // 200 day length means each minute will be rough 0.14 seconds
+const DAY_LENGTH = 30; // 200 day length means each minute will be rough 0.14 seconds
 const HOUR_LENGTH = DAY_LENGTH / 24;
 const MINUTE_LENGTH = HOUR_LENGTH / 60;
 

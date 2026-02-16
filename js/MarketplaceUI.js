@@ -19,7 +19,7 @@ export default class MarketPlaceUI extends Entity {
         this.buttonHeight = (this.height * 3 / 4) / rowSize;
         // this.columns = []; // create a column of sale buttons
         
-        this.items = [2, 3];
+        this.items = [2, 3, 4, 6, 7, 8, 5];
         // function to destroy object;
         const that = this;
         const close = () => {
@@ -35,10 +35,12 @@ export default class MarketPlaceUI extends Entity {
             (this.width / (4)) - 10, (this.height / (12)) - 5, close, "Close?", "#9093a1c3", "#1a1a1abf", "#9093a18d");
 
         this.buttons = [];
+        let buttonCount = 0;
         let x = this.x + (this.buttonHeight / 2);
         for (let i = 0; i < columnSize; i++) {
             for (let j = 0; j < rowSize; j++) {
-                this.itemSale(x, j, this.items[i + j]);
+                this.itemSale(x, j, this.items[buttonCount]);
+                buttonCount += 1;
             }
             x += this.buttonWidth + 5;
         }
@@ -61,7 +63,7 @@ export default class MarketPlaceUI extends Entity {
             if (itemData) {
                 const name = itemData.name;
                 const price = itemData.sellPrice;
-                const txt = "" + name + ":$" + price;
+                const txt = "" + name + ": $" + price;
                 const that = this;
                 const item = {
                     itemID: itemid,
@@ -69,12 +71,6 @@ export default class MarketPlaceUI extends Entity {
                 };
                 const addToInventory = () => {
                     const player = that.engine.getPlayer();
-                    // const slotIndex = player.inventory.slots[player.inventory.hasItem(1)];
-                    // if (slotIndex) { // we'll use item 1 as currency for now
-                    //     player.inventory.removeItem(player.inventory.hasItem(1));
-                    //     player.inventory.addItem(item); 
-                    // }
-
                     const money = player.inventory.money;
                     if (money && money >= itemData.sellPrice) {
                         player.inventory.money -= itemData.sellPrice;

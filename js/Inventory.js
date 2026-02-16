@@ -1,10 +1,11 @@
 import { getSave } from "./GeneralUtils/SaveDataRetrieval.js";
+import { CONSTANTS } from "/js/Util.js";
 
 // hotbar # of slots
-const HOTBAR_SIZE = 2;
+const HOTBAR_SIZE = 6;
 
 // backpack # of slots
-const BACKPACK_SIZE = 1;
+const BACKPACK_SIZE = 6;
 
 export default class Inventory {
     constructor() {
@@ -49,7 +50,9 @@ export default class Inventory {
                 data[i] = slotData;
             }
         }
-        console.log(data);
+        if (CONSTANTS.DEBUG) {
+            console.log(data);
+        }
         saveObj.setInventory(data);
         saveObj.setMoney(this.money)
     };
@@ -60,6 +63,7 @@ export default class Inventory {
                 return i; 
             }
         }
+        return null;
     }
 
     addItem(item) {
@@ -71,7 +75,9 @@ export default class Inventory {
         for (let i = 0; i < this.totalSlots; i++) {
             if (this.slots[i] && this.slots[i].itemID === item.itemID) {
                 this.slots[i].quantity += item.quantity;
-                console.log("Added to exisitng item");
+                if (CONSTANTS.DEBUG) {
+                    console.log("Added to exisitng item");
+                }
                 return true;
             }
         }
@@ -79,7 +85,9 @@ export default class Inventory {
         let index = this.findEmptySlot(0, this.hotbarSize);
         if (index !== -1) {
             this.slots[index] = item;
-            console.log("Item added to hotbar");
+            if (CONSTANTS.DEBUG) {
+                console.log("Item added to hotbar");
+            }
             return true;
         }
 
@@ -87,7 +95,9 @@ export default class Inventory {
         index = this.findEmptySlot(this.hotbarSize, this.totalSlots);
         if (index !== -1) {
             this.slots[index] = item;
-            console.log("Item added to backpack");
+            if (CONSTANTS.DEBUG) {
+                 console.log("Item added to backpack");   
+            }
             return true;
         }
 
@@ -131,10 +141,31 @@ export default class Inventory {
     equipSlot(slotIndex) {
         if (this.equippedSlot === slotIndex) {
             this.equippedSlot = null;
-            console.log("Unequipped slot:", this.slots[slotIndex].itemID)
+            console.log("Unequipped slot:", slotIndex + 1)
         } else if (this.slots[slotIndex]) {
             this.equippedSlot = slotIndex;
-            console.log("Equipped slot:", this.slots[slotIndex].itemID)
+            console.log("Equipped slot:", slotIndex + 1)
+        }
+    }
+
+    moveOrSwap(fromIndex, toIndex) {
+        if (fromIndex === toIndex) return;
+
+        const fromSlot = this.slots[fromIndex];
+        const toSlot = this.slots[toIndex];
+
+        if (!fromSlot) return;
+
+        // swap
+        this.slots[fromIndex] = toSlot;
+        this.slots[toIndex] = fromSlot;
+        console.log("Swapped", this.slots[fromIndex], "and", this.slots[toIndex]); 
+
+        // equipped slot
+        if (this.equippedSlot === fromIndex) {
+            this.equippedSlot = toIndex;
+        } else if (this.equippedSlot === toIndex) {
+            this.equippedSlot = fromIndex;
         }
     }
 
