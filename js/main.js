@@ -23,6 +23,9 @@ ASSET_MANAGER.queueDownload("/Assets/WorldItems/PotatoPlant-Sheet.png")
 
 //download from world tiles folder
 ASSET_MANAGER.queueDownload("/Assets/WorldTiles/Wood_(placed).webp")
+ASSET_MANAGER.queueDownload("/Assets/WorldTiles/WoodSheet.png")
+ASSET_MANAGER.queueDownload("/Assets/WorldTiles/BWoodSheet.png")
+ASSET_MANAGER.queueDownload("/Assets/WorldTiles/StoneSheet.png")
 ASSET_MANAGER.queueDownload("/Assets/WorldTiles/GrassSheet.png")
 
 //download from icons folder
