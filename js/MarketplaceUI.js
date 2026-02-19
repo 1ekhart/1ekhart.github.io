@@ -65,13 +65,13 @@ export default class MarketPlaceUI extends Entity {
                 const price = itemData.sellPrice;
                 const txt = "" + name + ": $" + price;
                 const that = this;
-                const item = {
-                    itemID: itemid,
-                    quantity: 1
-                };
                 const addToInventory = () => {
                     const player = that.engine.getPlayer();
                     const money = player.inventory.money;
+                    const item = {
+                        itemID: itemid,
+                        quantity: 1
+                    };
                     if (money && money >= itemData.sellPrice) {
                         player.inventory.money -= itemData.sellPrice;
                         player.inventory.addItem(item);

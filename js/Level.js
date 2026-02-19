@@ -12,7 +12,7 @@ import InventoryUI from '/js/InventoryUI.js';
 import DialogueBox from '/js/GeneralUtils/DialogueBox.js';
 import { wipeSave } from '/js/GeneralUtils/SaveDataRetrieval.js';
 import MarketPlace from '/js/MarketPlace.js';
-import MovingEntity from '/js/MovingEntity.js';
+import MovingEntity, { Basan } from '/js/MovingEntity.js';
 import Player from './Player.js';
 import StationPlaceholder from '/js/StationPlaceholder.js';
 
@@ -186,6 +186,8 @@ export default class LevelManager {
             startLevelFunc, "Load Game", "#81c2f3", "#040404"));
             that.menuButtons.push(new Button(centerX - (menuButtonWidth / 2), centerY + menuButtonHeight + 5, menuButtonWidth, menuButtonHeight,
             newGameWarning, "New Game", "#81c2f3", "#040404"))
+            that.menuButtons.push(new Button(centerX - (menuButtonWidth / 2), centerY + 2* (menuButtonHeight + 5), menuButtonWidth, menuButtonHeight,
+            startMenu, "Back", "#81c2f3", "#040404"))
             addMenuUIEntities();
         }
 
@@ -208,10 +210,32 @@ export default class LevelManager {
             addMenuUIEntities();
         }
 
+        const howToPlay = () => {
+            discardMenuUI();
+            that.menuButtons.push(new DialogueBox(that.engine, 
+                `DEFAULT CONTROLS: A+D to move, Space to jump, E to interact with objects (usually gives a pop-up to interact), ` +
+                `Mouse-Click to attack, you can click on the "B" icon to open the backpack, and you can select a slot on the backpack, and hold and drop to place it in other slots. `  +
+                `HOW TO PLAY: By day you harvest crops, forage for ingredients, and kill enemies for meat. By night, you run a restaurant and serve customers to make money to buy more ` +
+                `ingredients, and more pots that you can plant crops into. To cook a dish, select the ingredients specified on the recipe, and click on the highlighted recipe to cook. `, true, true));
+            that.menuButtons.push(new Button(centerX - (menuButtonWidth / 2), 2 * centerY - menuButtonHeight - 5, menuButtonWidth, menuButtonHeight,
+            startMenu, "Back", "#81c2f3", "#040404"))
+            
+            addMenuUIEntities();
+        }
+
+        const startMenu = () => {
+            discardMenuUI();
+            this.menuButtons.push(new Button(centerX - (menuButtonWidth/2), centerY, menuButtonWidth, menuButtonHeight,
+            levelSelect, "Start", "#81c2f3", "#040404"))
+            this.menuButtons.push(new Button(centerX - (menuButtonWidth/2), centerY + menuButtonHeight + 5, menuButtonWidth, menuButtonHeight,
+            howToPlay, "How To Play", "#81c2f3", "#040404"))
+            addMenuUIEntities();
+        }
+
         // this.engine.getClock().stopTime();
         // this.menuButtons.push(new InventoryUI(this.player, ctx));
-        this.menuButtons.push(new Button(centerX - (menuButtonWidth/2), centerY, menuButtonWidth, menuButtonHeight,
-            levelSelect, "Start", "#81c2f3", "#040404"))
+        // this.menuButtons.push(new Button(centerX - (menuButtonWidth/2), centerY, menuButtonWidth, menuButtonHeight,
+        //     levelSelect, "Start", "#81c2f3", "#040404"))
         const engine = this.engine;
 
         const addMenuUIEntities = () => {
@@ -219,7 +243,7 @@ export default class LevelManager {
             engine.addUIEntity(entity);
         })
         }
-        addMenuUIEntities();
+        startMenu();
     }
 
     //Initialize level 1;
@@ -239,7 +263,8 @@ export default class LevelManager {
         this.sceneEntities.push(new PottedPlant(this.engine, 12 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE, TILE_SIZE, 3, this.engine.getClock().dayCount));
         this.sceneEntities.push(new PottedPlant(this.engine, 15 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE, TILE_SIZE, 3, this.engine.getClock().dayCount));
         this.sceneEntities.push(new MarketPlace(this.engine, 18 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE, TILE_SIZE))
-        this.sceneEntities.push(new MovingEntity(this.engine, 15 * TILE_SIZE, 8 * TILE_SIZE));
+        // this.sceneEntities.push(new MovingEntity(this.engine, 15 * TILE_SIZE, 8 * TILE_SIZE));
+        this.sceneEntities.push(new Basan(this.engine, 15 * TILE_SIZE, 6 * TILE_SIZE));
         this.sceneEntities.push(new StationPlaceholder(this.engine, 6*TILE_SIZE, 4*TILE_SIZE, TILE_SIZE, TILE_SIZE));
 
         const engine = this.engine;
@@ -253,7 +278,7 @@ export default class LevelManager {
         this.sceneEntities.forEach(function (entity) {
             entity.removeFromWorld = true;
         })
-        this.data = level2;
+        this.data = level4;
 
         this.sceneEntities = [];
         this.sceneEntities.push(new Teleporter(this.engine, 4*TILE_SIZE, 7*TILE_SIZE, TILE_SIZE, TILE_SIZE, 1))

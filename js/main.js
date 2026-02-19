@@ -17,6 +17,9 @@ ASSET_MANAGER.queueDownload("/Assets/Player/IdleRun-Sheet.png")
 ASSET_MANAGER.queueDownload("/Assets/Player/Cursor-Sheet.png")
 ASSET_MANAGER.queueDownload("/Assets/Player/BladeEffect-Sheet.png")
 
+//download from the entities folder
+ASSET_MANAGER.queueDownload("/Assets/Entities/Basan-Sheet.png")
+
 //download from world items folder
 ASSET_MANAGER.queueDownload("/Assets/WorldItems/grey-pot.png")
 ASSET_MANAGER.queueDownload("/Assets/WorldItems/PotatoPlant-Sheet.png")

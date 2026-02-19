@@ -76,7 +76,7 @@ export default class Inventory {
             if (this.slots[i] && this.slots[i].itemID === item.itemID) {
                 this.slots[i].quantity += item.quantity;
                 if (CONSTANTS.DEBUG) {
-                    console.log("Added to exisitng item");
+                    console.log("Added to exisitng item, x"  + item.quantity);
                 }
                 return true;
             }

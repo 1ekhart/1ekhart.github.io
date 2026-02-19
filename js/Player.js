@@ -11,7 +11,7 @@ const floor = Math.floor;
 const WALKING_SPEED = 6;
 const ACCELERATION = 1;
 const JUMPING_STRENGTH = -9.5;
-const GRAVITY = 0.75;
+const GRAVITY = 0.6;
 const ATTACK_COOLDOWN = 0.3;
 
 export default class Player extends WorldEntity {

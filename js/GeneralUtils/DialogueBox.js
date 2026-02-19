@@ -6,7 +6,7 @@ import { CONSTANTS } from "/js/Util.js";
 // then delete itself when the "Close Dialogue" button is pressed, or just stay in the world until
 // the calling class destroys it manually
 export default class DialogueBox extends Entity {
-    constructor(engine, text, noClose) {
+    constructor(engine, text, noClose, extended) {
         super();
         this.engine = engine;
         this.x = (CONSTANTS.CANVAS_WIDTH / CONSTANTS.SCALE) / (6) // take up 1/3 of the screen;
@@ -14,6 +14,10 @@ export default class DialogueBox extends Entity {
         this.width = this.x * (4);
         this.height = this.y * (4);
         this.text = text;
+
+        if (extended) {
+            this.height *= 2;
+        }
 
         const that = this;
         // function to destroy object;
