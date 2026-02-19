@@ -5,8 +5,9 @@ import PottedPlant from '/js/PottedPlant.js';
 import Teleporter from '/js/Teleporter.js';
 import Oven from "/js/Oven.js";
 import PrepStation from "/js/PrepStation.js";
-import CookingStation from "/js/CookingStation.js";
 import { CONSTANTS } from '/js/Util.js';
+import Customer from '/js/Customer.js';
+import { RECIPES } from '/js/Data/Recipes.js';
 import Button from '/js/AbstractClasses/Button.js';
 import InventoryUI from '/js/InventoryUI.js';
 import DialogueBox from '/js/GeneralUtils/DialogueBox.js';
@@ -15,6 +16,8 @@ import MarketPlace from '/js/MarketPlace.js';
 import MovingEntity, { Basan } from '/js/MovingEntity.js';
 import Player from './Player.js';
 import StationPlaceholder from '/js/StationPlaceholder.js';
+import MovingEntity from '/js/MovingEntity.js';
+import CustomerManager from '/js/CustomerManager.js';
 
 // size of a tile in screen pixels
 const TILE_SIZE = 32;
@@ -150,6 +153,13 @@ export default class LevelManager {
         this.y = 0;
         this.loadMainMenu();
         //  keeps track of entities so we can load or destroy all of the entities in a particular scene.
+
+        this.customerSpots = [
+            { x: 21 * TILE_SIZE, y: 8 * TILE_SIZE },
+            { x: 22 * TILE_SIZE, y: 8 * TILE_SIZE }
+        ];
+
+        this.customerManager = new CustomerManager(this.engine, this.customerSpots);
     }
 
     loadMainMenu() {
@@ -175,7 +185,9 @@ export default class LevelManager {
             that.menu = false;
             discardMenuUI();
             this.engine.setClock(new InGameClock());
-            that.engine.addUIEntity(new InventoryUI(this.player, ctx));
+            const inventoryUI = new InventoryUI(this.player, ctx);
+            that.engine.inventoryUI = inventoryUI;
+            that.engine.addUIEntity(inventoryUI);
             that.engine.addUIEntity(new DialogueBox(that.engine, "Hello this is a dialogue box and You can close these by clicking the 'close' button."));
             that.teleport(1, 2, 2);
         }
@@ -262,6 +274,10 @@ export default class LevelManager {
         this.sceneEntities.push(new Teleporter(this.engine, 10*TILE_SIZE, 8*TILE_SIZE, TILE_SIZE, TILE_SIZE, 3));
         this.sceneEntities.push(new PottedPlant(this.engine, 12 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE, TILE_SIZE, 3, this.engine.getClock().dayCount));
         this.sceneEntities.push(new PottedPlant(this.engine, 15 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE, TILE_SIZE, 3, this.engine.getClock().dayCount));
+
+        //this.sceneEntities.push(new Customer(21 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE / 2, TILE_SIZE, testOrder, this.engine));
+        //this.sceneEntities.push(new Customer(22 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE / 2, TILE_SIZE, testOrder, this.engine));
+        
         this.sceneEntities.push(new MarketPlace(this.engine, 18 * TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE, TILE_SIZE))
         // this.sceneEntities.push(new MovingEntity(this.engine, 15 * TILE_SIZE, 8 * TILE_SIZE));
         this.sceneEntities.push(new Basan(this.engine, 15 * TILE_SIZE, 6 * TILE_SIZE));
@@ -271,10 +287,14 @@ export default class LevelManager {
         this.sceneEntities.forEach(function (entity) {
             engine.addEntity(entity, INTERACTABLE_OBJECT_LAYER);
         })
+
+        this.customerManager.setActive(true);
     }
 
     //Initialize level 2
     loadLevel2() {
+        this.customerManager.setActive(false);
+
         this.sceneEntities.forEach(function (entity) {
             entity.removeFromWorld = true;
         })
@@ -290,6 +310,8 @@ export default class LevelManager {
     }
 
     loadLevel3() {
+        this.customerManager.setActive(false);
+
         this.sceneEntities.forEach(function (entity) {
             entity.removeFromWorld = true;
         })
@@ -298,8 +320,14 @@ export default class LevelManager {
         this.sceneEntities = [];
         this.sceneEntities.push(new Teleporter(this.engine, 6*TILE_SIZE, 16*TILE_SIZE, TILE_SIZE, TILE_SIZE, 1));
         this.sceneEntities.push(new Teleporter(this.engine, 9*TILE_SIZE, 16*TILE_SIZE, TILE_SIZE, TILE_SIZE, 2));
-        this.sceneEntities.push(new Oven(3 * TILE_SIZE - .5 * TILE_SIZE, 13 * TILE_SIZE - .5 * TILE_SIZE, 64, 64, this.engine));
-        this.sceneEntities.push(new PrepStation(5 * TILE_SIZE, 13 * TILE_SIZE, TILE_SIZE, TILE_SIZE, new CookingStation("1"), this.engine));
+
+        const stationManager = this.engine.stationManager;
+
+        this.sceneEntities.push(new PrepStation(36 * TILE_SIZE, 16 * TILE_SIZE, TILE_SIZE, TILE_SIZE, stationManager.getStationById("1"), this.engine));
+        this.sceneEntities.push(new Oven(34 * TILE_SIZE - .5 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, 64, 64, stationManager.getStationById("1"),this.engine));
+
+        this.sceneEntities.push(new PrepStation(41 * TILE_SIZE, 16 * TILE_SIZE, TILE_SIZE, TILE_SIZE, stationManager.getStationById("2"), this.engine));
+        this.sceneEntities.push(new Oven(39 * TILE_SIZE - .5 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, 64, 64, stationManager.getStationById("2"),this.engine));
 
         const engine = this.engine;
         this.sceneEntities.forEach(function (entity) {
@@ -311,7 +339,7 @@ export default class LevelManager {
         const clock = this.engine.getClock();
         this.engine.setClock(new InGameClock());
         this.engine.getClock().removeFromWorld = true;
-        this.engine.setClock(clock);
+        this.engine.setClock(clock); 
     }
 
     teleport(level, x, y) { // use to initialize levels and player position
@@ -359,6 +387,8 @@ export default class LevelManager {
         } else if (this.y > lowOffsetY) {
             this.y = lowOffsetY;
         }
+
+        this.customerManager.update();
     }
 
     getTile(tileX, tileY) {

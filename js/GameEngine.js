@@ -7,6 +7,7 @@ import SaveDataRetrieval from "./GeneralUtils/SaveDataRetrieval.js";
 import EntityInteractable from "/js/AbstractClasses/EntityInteractable.js";
 import InGameClock from "/js/InGameClock.js";
 import { CONSTANTS } from "/js/Util.js";
+import CookingStationManager from "/js/CookingStationManager.js";
 
 const INPUT_MAP = {
     "KeyW": "up",
@@ -56,6 +57,12 @@ export default class GameEngine {
         this.options = options || {
             debugging: false,
         };
+
+        this.stationManager = new CookingStationManager();
+        this.stationManager.createStation("1");
+        this.stationManager.createStation("2");
+
+        this.customerManager = null;
     };
 
     /** @param {CanvasRenderingContext2D} ctx */
@@ -81,7 +88,7 @@ export default class GameEngine {
             y: e.clientY - this.ctx.canvas.getBoundingClientRect().top
         });
 
-         this.ctx.canvas.addEventListener("mousedown", e => {
+        this.ctx.canvas.addEventListener("mousedown", e => {
             const pos = getXandY(e);
             this.click = pos;
             this.mouseDown = pos;
@@ -249,6 +256,10 @@ export default class GameEngine {
                     entityColumns--;
                 }
             }
+        }
+
+        if (this.customerManager) {
+            this.customerManager.update();
         }
     };
 
