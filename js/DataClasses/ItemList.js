@@ -69,7 +69,7 @@ const Flour = {
 
 const BoarMeat = {
     itemID: 8,
-    name: "Boar Meat",
+    name: "Chicken Meat",
     width: 32,
     height: 32,
     scale: 1,
