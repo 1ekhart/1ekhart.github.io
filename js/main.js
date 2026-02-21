@@ -71,7 +71,7 @@ ASSET_MANAGER.downloadAll(() => {
 
     gameEngine.setPlayer(player);
     gameEngine.setLevel(new Level(gameEngine));
-    gameEngine.setCursor(new Cursor());
+    gameEngine.setCursor(new Cursor(gameEngine));
     // gameEngine.addEntity(new CollisionTester());
     // ctx.translate(-CONSTANTS.CANVAS_WIDTH / 4, 0)
 

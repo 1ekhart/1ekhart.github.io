@@ -154,8 +154,8 @@ export default class LevelManager {
         //  keeps track of entities so we can load or destroy all of the entities in a particular scene.
 
         this.customerSpots = [
-            { x: 21 * TILE_SIZE, y: 8 * TILE_SIZE },
-            { x: 22 * TILE_SIZE, y: 8 * TILE_SIZE }
+            { x: 2 * TILE_SIZE, y: 15 * TILE_SIZE },
+            { x: 6 * TILE_SIZE, y: 15 * TILE_SIZE }
         ];
 
         this.customerManager = new CustomerManager(this.engine, this.customerSpots);
@@ -257,6 +257,19 @@ export default class LevelManager {
         startMenu();
     }
 
+    addMenuUIEntities() {
+        const that = this;
+        this.menuButtons.forEach(function (entity) {
+            that.engine.addUIEntity(entity);
+        })
+    }
+
+    discardMenuUI() {
+        this.menuButtons.forEach(function (entity) {
+            entity.removeFromWorld = true;
+        })
+    }
+
     //Initialize level 1;
     loadLevel1() {
         // refresh scene entities
@@ -287,7 +300,7 @@ export default class LevelManager {
             engine.addEntity(entity, INTERACTABLE_OBJECT_LAYER);
         })
 
-        this.customerManager.setActive(true);
+        this.customerManager.setActive(false);
     }
 
     //Initialize level 2
@@ -300,7 +313,9 @@ export default class LevelManager {
         this.data = level4;
 
         this.sceneEntities = [];
-        this.sceneEntities.push(new Teleporter(this.engine, 4*TILE_SIZE, 7*TILE_SIZE, TILE_SIZE, TILE_SIZE, 1))
+        this.sceneEntities.push(new Teleporter(this.engine, 8*TILE_SIZE, 16*TILE_SIZE, TILE_SIZE, TILE_SIZE, 1))
+        this.sceneEntities.push(new Teleporter(this.engine, 10*TILE_SIZE, 16*TILE_SIZE, TILE_SIZE, TILE_SIZE, 3))
+
 
         const engine = this.engine;
         this.sceneEntities.forEach(function (entity) {
@@ -309,7 +324,7 @@ export default class LevelManager {
     }
 
     loadLevel3() {
-        this.customerManager.setActive(false);
+        this.customerManager.setActive(true);
 
         this.sceneEntities.forEach(function (entity) {
             entity.removeFromWorld = true;
@@ -317,10 +332,12 @@ export default class LevelManager {
         this.data = level3;
 
         this.sceneEntities = [];
-        this.sceneEntities.push(new Teleporter(this.engine, 6*TILE_SIZE, 16*TILE_SIZE, TILE_SIZE, TILE_SIZE, 1));
-        this.sceneEntities.push(new Teleporter(this.engine, 9*TILE_SIZE, 16*TILE_SIZE, TILE_SIZE, TILE_SIZE, 2));
+        this.sceneEntities.push(new Teleporter(this.engine, 10*TILE_SIZE, 16*TILE_SIZE, TILE_SIZE, TILE_SIZE, 1));
+        this.sceneEntities.push(new Teleporter(this.engine, 13*TILE_SIZE, 16*TILE_SIZE, TILE_SIZE, TILE_SIZE, 2));
 
         const stationManager = this.engine.stationManager;
+
+        this.sceneEntities.push(new StationPlaceholder(this.engine, 25 * TILE_SIZE, 16*TILE_SIZE, TILE_SIZE,TILE_SIZE));
 
         this.sceneEntities.push(new PrepStation(36 * TILE_SIZE, 16 * TILE_SIZE, TILE_SIZE, TILE_SIZE, stationManager.getStationById("1"), this.engine));
         this.sceneEntities.push(new Oven(34 * TILE_SIZE - .5 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, 64, 64, stationManager.getStationById("1"),this.engine));

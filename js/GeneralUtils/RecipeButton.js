@@ -24,6 +24,7 @@ export default class RecipeButton { // like button but with some added features
         this.recipeData = getRecipeData(recipeID);
         this.recipeItemData = getItemData(this.recipeData.itemID);
         this.dishName = this.recipeItemData.name;
+        this.ingredientListString = "";
 
         this.ingredientIcons = []; // we'll have an array of the different ingredient icons
 
@@ -32,6 +33,12 @@ export default class RecipeButton { // like button but with some added features
         Object.keys(this.ingredientList).forEach(key => {
             const ingredient = that.ingredientList[key];
             if (ingredient.hasSpecificIngredient == true) { // if a specific ingredient's listed, set it to the first eligible item
+                // this.ingredientListString += "["
+                // for (let i = 0; i < ingredient.eligibleIngredients.length - 1; i++) {
+                //     this.ingredientListString += getItemData(ingredient.eligibleIngredients[i]).name + "or";
+                // }
+                //     this.ingredientListString += getItemData(ingredient.eligibleIngredients[ingredient.eligibleIngredients.length-1]).name + "], ";
+                this.ingredientListString += getItemData(ingredient.eligibleIngredients[0]).name + ", "
                 const specificIngredient = getItemData(ingredient.eligibleIngredients[0]);
                 that.ingredientIcons.push(new Animator(ASSET_MANAGER.getAsset(specificIngredient.assetName), 0, 0, 
                                                 specificIngredient.width, specificIngredient.height, 1, 1, 0));
@@ -39,13 +46,17 @@ export default class RecipeButton { // like button but with some added features
                 // check which category and set it to a specific ingredient for each category
                 if (ingredient.category == "Vegetable") {
                     that.ingredientIcons.push(new Animator(ASSET_MANAGER.getAsset("/Assets/Icons/CabbageIcon.png"), 0, 0, 32, 32, 1, 1, 0))
+                    this.ingredientListString += "Any Veg, ";
                 } else if (ingredient.category == "Meat") {
                     that.ingredientIcons.push(new Animator(ASSET_MANAGER.getAsset("/Assets/Icons/BoarMeat.png"), 0, 0, 32, 32, 1, 1, 0))
+                    this.ingredientListString += "Any Meat, ";
                 } else if (ingredient.category == "Grain") {
                     that.ingredientIcons.push(new Animator(ASSET_MANAGER.getAsset("/Assets/Icons/Flour.png"), 0, 0, 32, 32, 1, 1, 0))
+                    this.ingredientListString += "Any Grain, ";
                 }
             }
         })
+        this.ingredientListString = this.ingredientListString.substring(0, this.ingredientListString.length - 2);
         this.hovered = false;
         console.log(this.ingredientIcons);
 
@@ -60,6 +71,10 @@ export default class RecipeButton { // like button but with some added features
 
     getName() {
         return this.dishName;
+    }
+
+    getIngredients() {
+        return this.ingredientListString;
     }
 
     isValidRecipe() {
@@ -185,19 +200,24 @@ export default class RecipeButton { // like button but with some added features
                 this.hovered = true;
                 engine.setMouseSignal(1);
                 this.parent.setSelectedElement(this.dishName);
+                this.parent.setSelectedIngredients(this.ingredientListString);
             } else if (!this.hovered){
                 this.parent.setSelectedElement(this.dishName);
+                this.parent.setSelectedIngredients(this.ingredientListString);
             }
             if (engine.click && this.isOpaque) {
                 console.log("JUST CLICKED")
                 this.addRecipeToPlayer(engine);
                 engine.setMouseSignal(0);
+                engine.getCursor().hideText();
                 engine.click = null;
             }
         } else if (this.hovered) {
             this.hovered = false;
+            engine.getCursor().hideText()
             engine.setMouseSignal(0);
             this.parent.setSelectedElement("");
+            this.parent.setSelectedIngredients("");
         }
     }
 
@@ -220,7 +240,7 @@ export default class RecipeButton { // like button but with some added features
             itemID: this.recipeItemData.itemID, 
             quantity: 1, 
             isDish: true,
-            ingredients: this.requestedIngredients
+            ingredients: this.requestedIngredients.slice()
         });
         that.parent.refreshIngredientData();
     }
