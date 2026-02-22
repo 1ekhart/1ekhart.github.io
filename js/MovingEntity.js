@@ -41,7 +41,7 @@ export default class MovingEntity extends WorldEntity {
         if(this.health <= 0) {
             this.remove()
             this.engine.addEntity(new Item(
-                8, // TODO: correct item type
+                8, // boar meat
                 this.x + 20, this.y,
                 0, -4,
                 4
@@ -111,14 +111,14 @@ export class Basan extends MovingEntity { // entity that should spawn a hitbox e
     loadAnimation() {
         this.animations = [];
         this.idle = new Animator(ASSET_MANAGER.getAsset("/Assets/Entities/Basan-Sheet.png"), 0, 0, 32, 32, 6, .25, 0, false, true)
-        this.animations["Idle"] = this.idle; 
+        this.animations["Idle"] = this.idle;
     }
 
     setAnimationState(state) {
         this.animationState = state;
     }
 
-    
+
 
 
     /** @param {GameEngine} engine */
@@ -147,7 +147,7 @@ export class Basan extends MovingEntity { // entity that should spawn a hitbox e
                 this.isRight = !this.isRight;
                 this.movementTimer = random(30, this.moveTimerMax);
             }
-            
+
         }
         this.movementTimer -= 1;
 
@@ -174,7 +174,7 @@ export class Basan extends MovingEntity { // entity that should spawn a hitbox e
         if (CONSTANTS.DEBUG) {
             ctx.strokeStyle = "#00ffff";
             ctx.strokeRect(this.x - engine.camera.x, this.y - engine.camera.y, this.width, this.height);
-            
+
         }
     }
 }

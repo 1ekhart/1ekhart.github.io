@@ -36,7 +36,7 @@ export default class Player extends WorldEntity {
 
     save(saveObject) { // saves the inventory list for now
         this.inventory.save(saveObject);
-    }   
+    }
 
     loadAnimations() {
         this.animations = [];
@@ -71,6 +71,12 @@ export default class Player extends WorldEntity {
         }
 
         if (this.haltMovement == false && engine.click && this.attackTimer <= 0) {
+            // attempt to use an item first instead of attacking
+            if(this.inventory.equippedSlot !== null && this.onGround) {
+                this.inventory.useItem(this.inventory.equippedSlot, this, engine)
+                engine.click = null;
+                return;
+            }
             this.setAnimationState("IdleAttack")
             this.haltMovement = true;
             this.attackTimer = ATTACK_COOLDOWN;
@@ -118,7 +124,7 @@ export default class Player extends WorldEntity {
         }
 
         if (this.haltMovement == false) {
-            if (engine.click) {
+            if (engine.click && this.inventory.equippedSlot === null) {
                 this.tryAttack();
             } else if (engine.input.left) {
                 this.setAnimationState("Run");
