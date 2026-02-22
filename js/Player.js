@@ -72,8 +72,8 @@ export default class Player extends WorldEntity {
 
         if (this.haltMovement == false && engine.click && this.attackTimer <= 0) {
             // attempt to use an item first instead of attacking
-            if(this.inventory.equippedSlot !== null && this.onGround) {
-                this.inventory.useItem(this.inventory.equippedSlot, this, engine)
+            if(this.inventory.getEquippedSlot() !== null && this.onGround) {
+                this.inventory.useItem(this.inventory.getEquippedSlot(), this, engine)
                 engine.click = null;
                 return;
             }
@@ -124,7 +124,7 @@ export default class Player extends WorldEntity {
         }
 
         if (this.haltMovement == false) {
-            if (engine.click && this.inventory.equippedSlot === null) {
+            if (engine.click && this.inventory.getEquippedSlot() === null) {
                 this.tryAttack();
             } else if (engine.input.left) {
                 this.setAnimationState("Run");

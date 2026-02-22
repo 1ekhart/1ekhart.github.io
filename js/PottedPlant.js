@@ -1,10 +1,11 @@
 import EntityInteractable from "/js/AbstractClasses/EntityInteractable.js";
 import Animator from "/js/GeneralUtils/Animator.js";
 import OnScreenTextSystem from "/js/GeneralUtils/OnScreenText.js";
+import DialogueBox from "/js/GeneralUtils/DialogueBox.js";
 import Item from "/js/Item.js";
 import Player from "/js/Player.js";
 import { CONSTANTS, randomInt, randomIntRange } from "/js/Util.js";
-import { getPlantData } from "/js/DataClasses/PotsAndPlants.js";
+import { getPlantData } from "./DataClasses/Plants.js";
 
 const potFill = "#6b583c";
 const plantGrowing = "#476b3c"
@@ -18,7 +19,7 @@ export default class PottedPlant extends EntityInteractable {
         this.x = x - (width / 2);
         this.y = y - (height / 2);
         this.dayPlaced = dayPlaced;
-
+        this.interactCooldown = 0;
 
         // get the area where the pot is rendered
         this.renderX = x;
@@ -41,12 +42,12 @@ export default class PottedPlant extends EntityInteractable {
         if (this.plant.regrows == false) {
             console.log(this.plant.name)
             this.plantSprite = new Animator(ASSET_MANAGER.getAsset(this.plant.assetName),
-            0, 0,
-            this.plant.width, this.plant.height, 3, 0, false, false);
+                0, 0,
+                this.plant.width, this.plant.height, 3, 0, false, false);
         } else { // if plant doesn't regrow there's a 4th frame
             this.plantSprite = new Animator(ASSET_MANAGER.getAsset(this.plant.assetName),
-            0, 0,
-            this.plant.width, this.plant.height, 4, 0, false, false);
+                0, 0,
+                this.plant.width, this.plant.height, 4, 0, false, false);
         }
     }
 
@@ -54,8 +55,6 @@ export default class PottedPlant extends EntityInteractable {
         if(!this.plant) return 0;
         return engine.getClock().dayCount / (this.dayPlaced + this.plant.growTime);
     }
-
-
 
     update(engine) {
         const newText = this.plant ? `${this.plant.name} in ${Math.floor((this.plant.growTime + this.dayPlaced - 1) /engine.clock.dayCount)} days` : "Empty"
@@ -70,12 +69,30 @@ export default class PottedPlant extends EntityInteractable {
                 }
             }
         }
+        if(this.interactCooldown > 0) {
+            this.interactCooldown -= 1;
+        }
     }
-
-
 
     /** @param {Player} player */
     interact(player) {
+        if(this.interactCooldown > 0) {
+            return;
+        }
+        this.interactCooldown = 60;
+
+        // planting
+        if(!this.plant) {
+            const equippedItemID = player.inventory.getEquippedItem()
+            if(getPlantData(equippedItemID)) {
+                this.initializePlant(equippedItemID)
+                player.inventory.removeItem(player.inventory.getEquippedSlot())
+            } else {
+                this.engine.addUIEntity(new DialogueBox(this.engine, "Select a vegetable item to plant it", false, false))
+            }
+        }
+
+        // harvesting
         if (this.getPercentGrown() >= 1) {
             this.dayPlaced = this.engine.clock.dayCount;
             console.log("Interacted!")
@@ -83,15 +100,11 @@ export default class PottedPlant extends EntityInteractable {
                 new Item(this.plant.itemID,
                     this.renderX + (this.width / 4), this.renderY - (this.height / 2),
                     randomIntRange(10, -10), -5,
-                    randomInt(5))
+                    randomIntRange(3, 5))
             )
             if (this.plant.regrows == true) {
                 this.dayPlaced = this.engine.clock.dayCount;
             }
-        }
-        if(!this.plant) {
-            this.initializePlant(3)
-            console.log("planted plant")
         }
     }
 
