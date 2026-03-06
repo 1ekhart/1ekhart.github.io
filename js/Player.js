@@ -153,11 +153,12 @@ export default class Player extends WorldEntity {
     /**
      * @param {CanvasRenderingContext2D} ctx
      * @param {GameEngine} engine
+     * @param {number} deltaTime
      */
-    draw(ctx, engine) {
+    draw(ctx, engine, deltaTime) {
         if (this.haltMovement === true && this.animations[this.animationState].isDone()) {this.goDefaultState();}
 
-        this.animations[this.animationState].drawFrame(CONSTANTS.TICK_TIME, ctx,
+        this.animations[this.animationState].drawFrame(deltaTime, ctx,
             (this.x - (20)) - engine.camera.x, floor(this.y) - (this.height) + (32) - floor(engine.camera.y),
              !this.isRight, 2)
         if (CONSTANTS.DEBUG == true) {
@@ -198,8 +199,8 @@ class BladeHitbox extends HitBox {
         }
     }
 
-    draw(ctx, engine) {
-        this.animation.drawFrame(CONSTANTS.TICK_TIME, ctx,
+    draw(ctx, engine, deltaTime) {
+        this.animation.drawFrame(deltaTime, ctx,
             this.x - engine.camera.x - this.facingLeftOffset, this.y - engine.camera.y - 20, !this.isFacingRight, 2);
 
         if (CONSTANTS.DEBUG == true) {
