@@ -5,7 +5,7 @@ import Player from '/js/Player.js';
 import Item from '/js/Item.js';
 import { randomIntRange, CONSTANTS } from '/js/Util.js';
 import { STATION_STATE, STEP_TYPE } from '/js/Constants/cookingStationStates.js';
-import CookingStationUI from '/js/GeneralUtils/CookingUI.js';
+import Animator from "/js/GeneralUtils/Animator.js";
 
 const idleColor = "#7393B3";
 const cookColor = "#36454F";
@@ -16,6 +16,7 @@ export default class Oven extends EntityInteractable {
         super();
         this.x = x;
         this.y = y;
+
         this.height = height;
         this.width = width;
         this.color = idleColor;
@@ -39,6 +40,7 @@ export default class Oven extends EntityInteractable {
         engine.addEntity(this.timer);
 
         this.displayingUI = false;
+        this.sprite = new Animator(ASSET_MANAGER.getAsset("/Assets/Entities/Oven.png"), 0, 0, 16, 32, 1, 1, 0, false, false);
     }
 
     /** @param {GameEngine} engine */
@@ -134,7 +136,7 @@ export default class Oven extends EntityInteractable {
 
     /**
      * @param {CanvasRenderingContext2D} ctx
-     * @param {GameEngine} enginea
+     * @param {GameEngine} engine
      */
     draw(ctx, engine) {
         // draw *something* if a subclass doesn't correctly draw anything

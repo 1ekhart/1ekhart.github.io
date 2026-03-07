@@ -23,6 +23,7 @@ const RiceBowl = {
     },
     steps: [
         { type: "ingredients"},
+        { type: "chop"},
         { type: "cook", duration: 120},
         { type: "assemble", duration: 120}
     ]
@@ -78,8 +79,9 @@ const Burger = {
     },
     steps: [
         { type: "ingredients"},
-        { type: "assemble", duration: 120},
-        { type: "cook", duration: 120}
+        { type: "cook", duration: 120},
+        { type: "chop", duration: 120},
+        { type: "assemble", duration: 120}
     ]
 }
 

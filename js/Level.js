@@ -5,6 +5,8 @@ import PottedPlant from '/js/PottedPlant.js';
 import Teleporter from '/js/Teleporter.js';
 import Oven from "/js/Oven.js";
 import PrepStation from "/js/PrepStation.js";
+import ChoppingStation from "/js/ChoppingStation.js";
+import MixingStation from '/js/MixingStation.js';
 import { CONSTANTS } from '/js/Util.js';
 import Customer from '/js/Customer.js';
 import { RECIPES } from '/js/Data/Recipes.js';
@@ -508,8 +510,10 @@ export default class LevelManager {
         this.sceneEntities = [];
         //this.sceneEntities.push(new StationPlaceholder(this.engine, 25 * TILE_SIZE, 16*TILE_SIZE, TILE_SIZE,TILE_SIZE));
 
-        this.sceneEntities.push(new PrepStation(36 * TILE_SIZE, 16 * TILE_SIZE, TILE_SIZE, TILE_SIZE, stationManager.getStationById("1"), this.engine));
-        this.sceneEntities.push(new Oven(34 * TILE_SIZE - .5 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, 64, 64, stationManager.getStationById("1"),this.engine));
+        this.sceneEntities.push(new PrepStation(22 * TILE_SIZE, 16 * TILE_SIZE, TILE_SIZE, TILE_SIZE, stationManager.getStationById("1"), this.engine));
+        this.sceneEntities.push(new Oven(23.5 * TILE_SIZE - .5 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, 64, 64, stationManager.getStationById("1"),this.engine));
+        this.sceneEntities.push(new ChoppingStation(25 * TILE_SIZE - .5 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, 64, 64, stationManager.getStationById("1"),this.engine));
+        this.sceneEntities.push(new MixingStation(26.5 * TILE_SIZE - .5 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, 64, 64, stationManager.getStationById("1"),this.engine));
 
         //this.sceneEntities.push(new Customer(40 * TILE_SIZE, 16 * TILE_SIZE, TILE_SIZE / 2, TILE_SIZE, testOrder, this.engine));
 
