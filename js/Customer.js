@@ -50,7 +50,7 @@ export default class Customer extends EntityInteractable {
         // sprite dish
         this.dishSprite = new Animator(ASSET_MANAGER.getAsset(getItemData(this.recipeItemID).assetName), 0, 0, getItemData(this.recipeItemID).width, getItemData(this.recipeItemID).height, 1, 1, 0);
 
-        this.customerFrame = Math.floor(Math.random() * 4);
+        this.customerFrame = Math.floor(Math.random() * 6);
         this.customerSprite = new Animator(ASSET_MANAGER.getAsset("/Assets/Entities/Customers.png"), 0, 0, 32, 32, 1, 1, 0, false, false);
     }
 
@@ -208,8 +208,8 @@ export default class Customer extends EntityInteractable {
         this.customerSprite.drawFramePlain(ctx, this.x - engine.camera.x - 10, this.y - engine.camera.y - 8, 2, this.customerFrame);
 
         // chat bubble
-        const bubbleX = this.x + this.width / 2 - 16 - engine.camera.x;
-        const bubbleY = this.y - 36 - engine.camera.y;
+        const bubbleX = this.x + this.width / 2 - 16 - engine.camera.x + 10;
+        const bubbleY = this.y - 42 - engine.camera.y;
         let bubbleToDraw;
         if (this.isAngry) {
             bubbleToDraw = this.angryBubbleSprite;
