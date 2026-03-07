@@ -21,16 +21,19 @@ export default class Customer extends EntityInteractable {
         this.recipeID = order.recipeID;
         this.recipeItemID = getRecipeData(this.recipeID).itemID
         this.recipeName = getItemData(this.recipeItemID).name;
-        this.ingredientID = order.specificIngredient;
-        this.ingredientName = getItemData(this.ingredientID).name;
+
+        //this.ingredientID = order.specificIngredient;
+        //this.ingredientName = getItemData(this.ingredientID).name;
+        this.ingredientNames = order.ingredients.map(id => getItemData(id)?.name ?? "Unknown").join(", ");
+
         this.orderTaken = false;
         this.orderCompleted = false;
-        this.text = `Press E to take order: ${this.recipeName} with ${this.ingredientName}`;
+        this.text = `Press E to take order: ${this.recipeName} with ${this.ingredientNames}`;
         this.interactionCooldown = interactionCooldown;
         console.log(this.text);
         this.prompt = new OnScreenTextSystem(this, x + width/2, y - 2, `${this.text}`, false);
 
-        this.waitTime = 18; // testing
+        this.waitTime = 90; // testing
         this.remainingTime = this.waitTime;
         this.timerDisplay = new OnScreenTextSystem(this, x + width / 2, y - 17, this.formatTime(this.remainingTime), false);
         
@@ -54,14 +57,14 @@ export default class Customer extends EntityInteractable {
         this.interactionCooldown = interactionCooldown;
         // if order not taken yet -> take it
         if (!this.orderTaken) {
-            // const availableStation = this.engine.stationManager.getAvailableStation();
-            // if (!availableStation) {
-            //     console.log("No available cooking stations!");
-            //     return;
-            // }
-            // availableStation.assignOrder(this.order);
+            const availableStation = this.engine.stationManager.getAvailableStation();
+            if (!availableStation) {
+                console.log("No available cooking stations!");
+                return;
+            }
+            availableStation.assignOrder(this.order);
             this.orderTaken = true;
-            this.prompt.changeText(`Order taken! Bring: ${this.recipeName} with ${this.ingredientName}`);
+            this.prompt.changeText(`Order taken! Bring: ${this.recipeName} with ${this.ingredientNames}`);
             this.prompt.showText();
 
             this.timerDisplay.showText();
@@ -77,10 +80,19 @@ export default class Customer extends EntityInteractable {
             const playerInventory = player.inventory;
 
             if (equippedItem == this.recipeItemID && playerInventory.slots[playerInventory.getEquippedSlot()].isDish) { // check if the idno matches then do an additional check if the ingredient is there
+                
+                const dishIngredients = playerInventory.slots[playerInventory.getEquippedSlot()].ingredients;
+                const orderIngredients = this.order.ingredients;
+                const match = orderIngredients.every(id => dishIngredients.includes(id));
+                if (!match) {
+                    this.engine.addUIEntity(new DialogueBox(this.engine, "This is the right dish but with the wrong ingredients!", false, false));
+                    return;
+                }
+                /*
                 if (!playerInventory.slots[playerInventory.getEquippedSlot()].ingredients.includes(this.ingredientID)) {
                     this.engine.addUIEntity(new DialogueBox(this.engine, "This is the right dish but with the wrong ingredients!", false, false))
                     return;
-                }
+                }*/
                 player.inventory.money += this.calculateMoney(player, playerInventory.getEquippedSlot());
                 player.inventory.removeItem(player.inventory.equippedSlot);
                 this.orderCompleted = true;
@@ -205,7 +217,7 @@ export default class Customer extends EntityInteractable {
         bubbleToDraw.drawFramePlain(ctx, bubbleX, bubbleY, 1);
         
         // dish
-        const dishScale = 20 / getItemData(this.ingredientID).width;
+        const dishScale = 20 / getItemData(this.recipeItemID).width;
         const dishX = bubbleX + (32 - 20) / 2;
         const dishY = bubbleY + (34 - 22) / 2;
         if (!this.isAngry) {

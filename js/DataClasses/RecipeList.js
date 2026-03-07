@@ -20,7 +20,12 @@ const RiceBowl = {
             hasSpecificIngredient: false,
             category: "Meat"
         }
-    }
+    },
+    steps: [
+        { type: "ingredients"},
+        { type: "cook", duration: 120},
+        { type: "assemble", duration: 120}
+    ]
 }
 
 const Flour = { // joke/prototype item do not add!!
@@ -70,7 +75,12 @@ const Burger = {
             hasSpecificIngredient: false,
             category: "Vegetable"
         }
-    }
+    },
+    steps: [
+        { type: "ingredients"},
+        { type: "assemble", duration: 120},
+        { type: "cook", duration: 120}
+    ]
 }
 
 export const recipeList = {

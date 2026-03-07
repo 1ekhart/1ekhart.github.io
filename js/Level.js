@@ -19,6 +19,7 @@ import StationPlaceholder from '/js/StationPlaceholder.js';
 import CustomerManager from '/js/CustomerManager.js';
 import Item from "/js/Item.js";
 import MarketPlaceUI from '/js/MarketplaceUI.js';
+import { getRecipeData } from '/js/DataClasses/RecipeList.js';
 
 // size of a tile in screen pixels
 const TILE_SIZE = 32;
@@ -488,8 +489,12 @@ export default class LevelManager {
     loadLevel3() {
         this.currentLevel = 3;
         this.customerManager.setActive(true);
+        const stationManager = this.engine.stationManager;
+
         if (this.engine.getClock().isCookingMode) {
+
             this.customerManager.reset();
+            stationManager.resetAllStations();
             this.customerManager.setActive(true);
         } else {
             this.customerManager.setActive(false);
@@ -501,7 +506,13 @@ export default class LevelManager {
         this.data = level3;
 
         this.sceneEntities = [];
-        this.sceneEntities.push(new StationPlaceholder(this.engine, 25 * TILE_SIZE, 16*TILE_SIZE, TILE_SIZE,TILE_SIZE));
+        //this.sceneEntities.push(new StationPlaceholder(this.engine, 25 * TILE_SIZE, 16*TILE_SIZE, TILE_SIZE,TILE_SIZE));
+
+        this.sceneEntities.push(new PrepStation(36 * TILE_SIZE, 16 * TILE_SIZE, TILE_SIZE, TILE_SIZE, stationManager.getStationById("1"), this.engine));
+        this.sceneEntities.push(new Oven(34 * TILE_SIZE - .5 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, 64, 64, stationManager.getStationById("1"),this.engine));
+
+        //this.sceneEntities.push(new Customer(40 * TILE_SIZE, 16 * TILE_SIZE, TILE_SIZE / 2, TILE_SIZE, testOrder, this.engine));
+
         this.sceneEntities.push(new BedroomDoor(30 * TILE_SIZE, 16*TILE_SIZE, this.engine));
         this.sceneEntities.push(new HouseDoor(this.engine, 42*TILE_SIZE, 16*TILE_SIZE, false));
 
