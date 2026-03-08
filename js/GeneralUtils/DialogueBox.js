@@ -2,7 +2,7 @@ import Button from "/js/AbstractClasses/Button.js";
 import Entity from "/js/AbstractClasses/Entity.js";
 import { CONSTANTS } from "/js/Util.js";
 
-// simple dialogue box to display a message to a fixed area in the game camera 
+// simple dialogue box to display a message to a fixed area in the game camera
 // then delete itself when the "Close Dialogue" button is pressed, or just stay in the world until
 // the calling class destroys it manually
 export default class DialogueBox extends Entity {
@@ -38,7 +38,7 @@ export default class DialogueBox extends Entity {
 
         if (!noClose == true) {
             console.log("made close")
-            this.closeButton = new Button(this.x + this.width - (this.width / (4)), this.y + this.height - (this.height / (4)), 
+            this.closeButton = new Button(this.x + this.width - (this.width / (4)), this.y + this.height - (this.height / (4)),
                 (this.width / (4)) - 10, (this.height / (4)) - 5, close, "Close?", "#9093a1c3", "#1a1a1abf", "#9093a18d");
             this.engine.addUIEntity(this.closeButton);
             engine.getClock().stopTime();
@@ -69,7 +69,6 @@ export default class DialogueBox extends Entity {
 
 
     draw(ctx, engine) {
-        ctx.save();
         ctx.beginPath();
         ctx.roundRect(this.x, this.y, this.width, this.height, (2 * CONSTANTS.SCALE));
         ctx.fillStyle = "#3e71ff9a";
@@ -77,7 +76,6 @@ export default class DialogueBox extends Entity {
 
         ctx.strokeStyle = "#000000c0"
         ctx.fillStyle = "#ffffffcb"
-        ctx.font = '12px monospace';
         ctx.lineWidth = 2;
         let textX = this.x + (this.width / 36);
         let textY = this.y + (this.height / 8);
@@ -86,7 +84,6 @@ export default class DialogueBox extends Entity {
             ctx.fillText(this.lines[i], textX, textY);
             textY += this.fontHeight + 5;
         }
-        ctx.restore();
-
+        ctx.lineWidth = 1;
     }
 }

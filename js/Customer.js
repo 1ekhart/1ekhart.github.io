@@ -25,15 +25,12 @@ export default class Customer extends EntityInteractable {
         this.recipeItemID = getRecipeData(this.recipeID).itemID
         this.recipeName = getItemData(this.recipeItemID).name;
         if (order.specificIngredient) {
-            this.specificIngredient = true
             this.ingredientID = order.specificIngredient;
             this.ingredientName = getItemData(this.ingredientID).name;
-            // this.text = `Press E to take order: ${this.recipeName} with ${this.ingredientName}`;
+            this.text = `${this.recipeName} with ${this.ingredientName}`;
         } else {
-            this.specificIngredient = false
-            // this.text = `Press E to take order: ${this.recipeName}`
+            this.text = `${this.recipeName}`;
         }
-        this.text = "Press E to take order or F to refuse"
         this.orderTaken = false;
         this.orderCompleted = false;
         this.interactionCooldown = INTERACTION_COOLDOWN;
@@ -68,9 +65,8 @@ export default class Customer extends EntityInteractable {
             // }
             // availableStation.assignOrder(this.order);
             this.orderTaken = true;
-            if (this.specificIngredient) {
+            if (this.ingredientID) {
                 this.prompt.changeText(`Order taken! Bring: ${this.recipeName} with ${this.ingredientName}`);
-
             } else {
                 this.prompt.changeText(`Order taken! Bring: ${this.recipeName}`);
             }
