@@ -32,8 +32,11 @@ ASSET_MANAGER.queueDownload("/Assets/WorldTiles/WoodSheet.png")
 ASSET_MANAGER.queueDownload("/Assets/WorldTiles/BWoodSheet.png")
 ASSET_MANAGER.queueDownload("/Assets/WorldTiles/StoneSheet.png")
 ASSET_MANAGER.queueDownload("/Assets/WorldTiles/GrassSheet.png")
-ASSET_MANAGER.queueDownload("/Assets/WorldTiles/Stool.png")
 ASSET_MANAGER.queueDownload("/Assets/WorldTiles/Backgrounds.png")
+ASSET_MANAGER.queueDownload("/Assets/WorldTiles/MorningBG.png")
+ASSET_MANAGER.queueDownload("/Assets/WorldTiles/AfternoonBG.png")
+ASSET_MANAGER.queueDownload("/Assets/WorldTiles/SunsetBG.png")
+ASSET_MANAGER.queueDownload("/Assets/WorldTiles/NightBG.png")
 
 //download from icons folder
 ASSET_MANAGER.queueDownload("/Assets/Icons/BurgerPlate.png")
