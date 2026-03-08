@@ -20,11 +20,14 @@ ASSET_MANAGER.queueDownload("/Assets/Player/BladeEffect-Sheet.png")
 //download from the entities folder
 ASSET_MANAGER.queueDownload("/Assets/Entities/Basan-Sheet.png")
 ASSET_MANAGER.queueDownload("/Assets/Entities/Oven.png")
+ASSET_MANAGER.queueDownload("/Assets/Entities/Fryer.png")
 ASSET_MANAGER.queueDownload("/Assets/Entities/Door-Sheet.png")
 
 //download from world items folder
 ASSET_MANAGER.queueDownload("/Assets/WorldItems/grey-pot.png")
 ASSET_MANAGER.queueDownload("/Assets/WorldItems/PotatoPlant-Sheet.png")
+ASSET_MANAGER.queueDownload("/Assets/WorldItems/PumpkinPlant-Sheet.png")
+
 
 //download from world tiles folder
 ASSET_MANAGER.queueDownload("/Assets/WorldTiles/Wood_(placed).webp")
@@ -46,12 +49,18 @@ ASSET_MANAGER.queueDownload("/Assets/Icons/RiceBowl.png")
 ASSET_MANAGER.queueDownload("/Assets/Icons/CabbageIcon.png")
 ASSET_MANAGER.queueDownload("/Assets/Icons/Flour.png")
 ASSET_MANAGER.queueDownload("/Assets/Icons/BoarMeat.png")
-ASSET_MANAGER.queueDownload("/Assets/Icons/Coin.png")
+ASSET_MANAGER.queueDownload("/Assets/Icons/CoinHeart.png")
 ASSET_MANAGER.queueDownload("/Assets/Icons/backpack.png");
 ASSET_MANAGER.queueDownload("/Assets/Icons/OrderBubble.png")
 ASSET_MANAGER.queueDownload("/Assets/Icons/PendingOrder.png")
 ASSET_MANAGER.queueDownload("/Assets/Icons/AngryOrder.png")
 ASSET_MANAGER.queueDownload("/Assets/Icons/CompleteOrder.png")
+ASSET_MANAGER.queueDownload("/Assets/Icons/Croquettes.png")
+ASSET_MANAGER.queueDownload("/Assets/Icons/FriedPumpkin.png")
+ASSET_MANAGER.queueDownload("/Assets/Icons/PumpkinIcon.png")
+
+
+
 
 
 

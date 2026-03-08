@@ -1,7 +1,7 @@
 import Customer from "/js/Customer.js";
-import { getCategoryGrains, getCategoryMeats, getCategoryVegetables } from "/js/DataClasses/ItemList.js";
+import { getCategoryGrains, getCategoryMeats, getCategoryVegetables, getItemData } from "/js/DataClasses/ItemList.js";
 import { getRecipeData, recipeList } from "/js/DataClasses/RecipeList.js";
-import { randomIntRange } from "/js/Util.js";
+import { CONSTANTS, randomIntRange } from "/js/Util.js";
 
 const customersPerDay = 6; 
 export default class CustomerManager {
@@ -48,7 +48,9 @@ export default class CustomerManager {
             recipeID: recipeID,
             specificIngredient: this.generateRandomRecipe(recipeID)
         }
-        console.log(randomOrder);
+        if (CONSTANTS.DEBUG) {
+            console.log(randomOrder);
+        }
 
         const customer = new Customer (spot.x, spot.y, 16, 32, randomOrder, this.engine);
 
@@ -109,10 +111,35 @@ export default class CustomerManager {
     generateRandomRecipe(recipeID) { // returns the item ID of a random item from the "all ___" categories of the dish
         const recipe = getRecipeData(recipeID).ingredients;
         let gotItem = false;
+        // check the edge case that all ingredients are specific
+        let hasAnyGenericIngredient = false;
+        for (let i = 1; i <= Object.keys(recipe).length; i++) {
+            const ingredient= recipe[i];
+            if (ingredient.hasSpecificIngredient == false) {
+                hasAnyGenericIngredient = true;
+                if (CONSTANTS.DEBUG) {
+                    console.log("Recipe " + recipeID + " has a specific ingredient at index: " + i)
+                }
+                break;
+            }
+        }
+        if (hasAnyGenericIngredient != true) {
+            if (CONSTANTS.DEBUG) {
+                console.log("Recipe " + recipeID + " does not have any specific ingredient")
+            }
+            return null;
+        }
+        let amountOfLoops = 1;
         // get a random ingredient from 
         while (gotItem !== true) {
             const ingredientListLength = Object.keys(recipe).length;
-            const keyIndex = randomIntRange(ingredientListLength, 1);
+            // if (amountOfLoops > ingredientListLength * 50) { // track the loop count and if there still isn't an ingredient found then raise a warning
+            //     if (CONSTANTS.DEBUG) {
+            //         console.log("For some reason could not find any specific ingredient for recipe: " + getItemData(getRecipeData(recipeID).itemID).name) 
+            //     }
+            //     return null;
+            // }
+            const keyIndex = randomIntRange(ingredientListLength + 1, 1);
             const ingredient = recipe[keyIndex];
             if (ingredient.hasSpecificIngredient != true) {
                 if (ingredient.category == "Vegetable") {
@@ -132,6 +159,7 @@ export default class CustomerManager {
                     return category[randomIndex].itemID;
                 }
             } else {
+                amountOfLoops++;
                 gotItem = false;
             }
         }

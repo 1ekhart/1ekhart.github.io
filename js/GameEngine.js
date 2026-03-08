@@ -16,6 +16,8 @@ const INPUT_MAP = {
     "KeyD": "right",
     "Space": "jump",
     "KeyE": "interact",
+    "KeyF": "refuse",
+    "Escape": "escape",
     // alternate platformer style controls (like hollow knight, celeste, etc. can change if necessary)
     "ArrowUp": "up",
     "ArrowDown": "down",
@@ -248,16 +250,18 @@ export default class GameEngine {
             for (let j = 0; j < entityColumns; j++) {
                 let entity = entityLayer[j];
 
-                if (!entity.removeFromWorld) {
+                if (!entity.removeFromWorld && !entity.doNotUpdate) {
                     entity.update(this);
-                } else { // small change to remove elements without re-iterating through the entity list
+                } else if (entity.removeFromWorld) {// small change to remove elements without re-iterating through the entity list
                     if (CONSTANTS.DEBUG) {
-                        console.log("Just destroyed " + entity.constructor.name)
+                        // console.log("Just destroyed " + entity.constructor.name)
                     }
                 
                     entityLayer.splice(j, 1);
                     j--;
                     entityColumns--;
+                } else {
+                    continue;
                 }
             }
         }
@@ -283,7 +287,9 @@ export default class GameEngine {
         }
 
         this.draw(deltaTime);
-        this.ctx.fillStyle = "black";
-        this.ctx.fillText(`fps: ${(1 / deltaTime).toFixed(2)}`, 0, 12);
+        if (CONSTANTS.DEBUG) {
+            this.ctx.fillStyle = "black";
+            this.ctx.fillText(`fps: ${(1 / deltaTime).toFixed(2)}`, 0, 12);
+        }
     }
 }

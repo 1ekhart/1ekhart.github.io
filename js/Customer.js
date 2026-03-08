@@ -21,13 +21,18 @@ export default class Customer extends EntityInteractable {
         this.recipeID = order.recipeID;
         this.recipeItemID = getRecipeData(this.recipeID).itemID
         this.recipeName = getItemData(this.recipeItemID).name;
-        this.ingredientID = order.specificIngredient;
-        this.ingredientName = getItemData(this.ingredientID).name;
+        if (order.specificIngredient) {
+            this.ingredientID = order.specificIngredient;
+            this.ingredientName = getItemData(this.ingredientID).name;
+            // this.text = `Press E to take order: ${this.recipeName} with ${this.ingredientName}`;
+        } else {
+            // this.text = `Press E to take order: ${this.recipeName}`
+        }
+        this.text = "Press E to take order or F to refuse"
         this.orderTaken = false;
         this.orderCompleted = false;
-        this.text = `Press E to take order: ${this.recipeName} with ${this.ingredientName}`;
         this.interactionCooldown = interactionCooldown;
-        console.log(this.text);
+        // console.log(this.text);
         this.prompt = new OnScreenTextSystem(this, x + width/2, y - 2, `${this.text}`, false);
 
         this.waitTime = 18; // testing
@@ -61,7 +66,12 @@ export default class Customer extends EntityInteractable {
             // }
             // availableStation.assignOrder(this.order);
             this.orderTaken = true;
-            this.prompt.changeText(`Order taken! Bring: ${this.recipeName} with ${this.ingredientName}`);
+            if (this.specificIngredient) {
+                this.prompt.changeText(`Order taken! Bring: ${this.recipeName} with ${this.ingredientName}`);
+
+            } else {
+                this.prompt.changeText(`Order taken! Bring: ${this.recipeName}`);
+            }
             this.prompt.showText();
 
             this.timerDisplay.showText();
@@ -77,9 +87,11 @@ export default class Customer extends EntityInteractable {
             const playerInventory = player.inventory;
 
             if (equippedItem == this.recipeItemID && playerInventory.slots[playerInventory.getEquippedSlot()].isDish) { // check if the idno matches then do an additional check if the ingredient is there
-                if (!playerInventory.slots[playerInventory.getEquippedSlot()].ingredients.includes(this.ingredientID)) {
+                if (this.ingredientID) {
+                    if (!playerInventory.slots[playerInventory.getEquippedSlot()].ingredients.includes(this.ingredientID)) {
                     this.engine.addUIEntity(new DialogueBox(this.engine, "This is the right dish but with the wrong ingredients!", false, false))
                     return;
+                }
                 }
                 player.inventory.money += this.calculateMoney(player, playerInventory.getEquippedSlot());
                 player.inventory.removeItem(player.inventory.equippedSlot);
@@ -103,6 +115,12 @@ export default class Customer extends EntityInteractable {
                 console.log("This is not my order!");
             }
         }
+    }
+    
+    refuseOrder(player) {
+        // if (this.orderTaken) {return;}
+        this.removeFromWorld = true;
+        if (this.onComplete) this.onComplete();
     }
 
     formatTime(seconds) {
@@ -205,7 +223,7 @@ export default class Customer extends EntityInteractable {
         bubbleToDraw.drawFramePlain(ctx, bubbleX, bubbleY, 1);
         
         // dish
-        const dishScale = 20 / getItemData(this.ingredientID).width;
+        const dishScale = 20 / getItemData(this.recipeItemID).width;
         const dishX = bubbleX + (32 - 20) / 2;
         const dishY = bubbleY + (34 - 22) / 2;
         if (!this.isAngry) {
