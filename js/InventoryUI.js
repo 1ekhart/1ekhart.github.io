@@ -206,7 +206,7 @@ export default class InventoryUI {
         this.moneySprite.drawFramePlain(this.ctx, this.backpackButtonX/2, this.coinInfoY - 16, 1.5);
         this.ctx.save();
         this.ctx.font = "15px monospace";
-        this.ctx.strokeStyle = "#00000049"
+        this.ctx.strokeStyle = "#faf8f863"
         this.ctx.fillStyle = "rgb(74, 40, 2)";
         this.ctx.strokeText(": $" + this.player.inventory.money, this.backpackButtonX/2 + CoinIconWidth, this.coinInfoY)
         this.ctx.fillText(": $" + this.player.inventory.money, this.backpackButtonX/2 + CoinIconWidth, this.coinInfoY)

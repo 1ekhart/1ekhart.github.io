@@ -585,7 +585,7 @@ export default class LevelManager {
         })
 
         if (this.engine.getClock().isCookingMode && this.engine.getClock().dayCount <= 1) {
-            this.engine.addUIEntity(new DialogueBox(this.engine, "Take orders from the customers before they walk out! Customers will ask for a dish with a specific ingredient, so go to a cooking station and make sure you use it while cooking."));
+            this.engine.addUIEntity(new DialogueBox(this.engine, "Take orders from the customers before they walk out! Customers will ask for a dish with a specific ingredient, so go to a cooking station and make sure you use it while cooking. If you don't have the ingredients, press F to refuse their order, and someone else might take their spot!"));
             this.engine.getClock().stopTime();
         }
     }

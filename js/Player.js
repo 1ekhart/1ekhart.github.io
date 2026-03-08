@@ -6,6 +6,7 @@ import HitBox from "./GeneralUtils/BoundingBox.js";
 import Inventory from "/js/Inventory.js";
 import MovingEntity from "/js/MovingEntity.js";
 import { CONSTANTS, decreaseToZero } from "/js/Util.js";
+import Customer from "/js/Customer.js";
 
 const floor = Math.floor;
 
@@ -92,6 +93,18 @@ export default class Player extends WorldEntity {
                     }
                 }
             }
+            }
+        }
+
+        if (engine.input.refuse) { // refuse an order from a customer if pressing F
+            if (engine.entities[3]) {
+                for (const entity of engine.entities[3]) {
+                    if (entity instanceof Customer && this.isCollidingWith(entity)) {
+                        if (entity.refuseOrder) {
+                            entity.refuseOrder(this);
+                        }
+                    } 
+                }
             }
         }
 

@@ -16,6 +16,7 @@ const INPUT_MAP = {
     "KeyD": "right",
     "Space": "jump",
     "KeyE": "interact",
+    "KeyF": "refuse",
     "Escape": "escape",
     // alternate platformer style controls (like hollow knight, celeste, etc. can change if necessary)
     "ArrowUp": "up",
@@ -253,7 +254,7 @@ export default class GameEngine {
                     entity.update(this);
                 } else if (entity.removeFromWorld) {// small change to remove elements without re-iterating through the entity list
                     if (CONSTANTS.DEBUG) {
-                        console.log("Just destroyed " + entity.constructor.name)
+                        // console.log("Just destroyed " + entity.constructor.name)
                     }
                 
                     entityLayer.splice(j, 1);

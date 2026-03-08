@@ -95,6 +95,9 @@ export default class InGameClock extends Entity {
         } else if (this.dayCount == 7) {
             this.engine.addUIEntity(new DialogueBox(this.engine, "Congrats! You didn't go bankrupt! You can keep playing and try to get as much money as you can!"))
         }
+        //restore player health
+        const player = this.engine.getPlayer();
+        player.health = player.maxHealth;
         this.engine.getLevel().teleport(3, 30, 15.5);
     }
 
