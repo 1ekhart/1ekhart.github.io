@@ -14,11 +14,14 @@ const ASSET_MANAGER = new AssetManager();
 
 //download from player folder
 ASSET_MANAGER.queueDownload("/Assets/Player/IdleRun-Sheet.png")
+ASSET_MANAGER.queueDownload("/Assets/Player/InGameClock-Sheet.png")
 ASSET_MANAGER.queueDownload("/Assets/Player/Cursor-Sheet.png")
 ASSET_MANAGER.queueDownload("/Assets/Player/BladeEffect-Sheet.png")
 
 //download from the entities folder
 ASSET_MANAGER.queueDownload("/Assets/Entities/Basan-Sheet.png")
+ASSET_MANAGER.queueDownload("/Assets/Entities/BasanFireAttack-Sheet.png")
+
 ASSET_MANAGER.queueDownload("/Assets/Entities/Oven.png")
 ASSET_MANAGER.queueDownload("/Assets/Entities/Fryer.png")
 ASSET_MANAGER.queueDownload("/Assets/Entities/Door-Sheet.png")

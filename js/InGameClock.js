@@ -1,5 +1,6 @@
 /** @import GameEngine from "/js/GameEngine.js" */
 import Entity from "/js/AbstractClasses/Entity.js";
+import Animator from "/js/GeneralUtils/Animator.js";
 import DialogueBox from "/js/GeneralUtils/DialogueBox.js";
 import { appendSaveData, getSave } from "/js/GeneralUtils/SaveDataRetrieval.js";
 import LevelManager from "/js/Level.js";
@@ -18,7 +19,9 @@ const MODE_SWITCH_HOUR = 14; // game switches from gathering to cooking at this 
 export default class InGameClock extends Entity {
     constructor(engine) {
         super();
-        this.x = 200;
+        this.x = (CONSTANTS.CANVAS_WIDTH / CONSTANTS.SCALE) * 3 / 4;
+        this.y = (CONSTANTS.CANVAS_HEIGHT / CONSTANTS.SCALE) / 15
+        
         this.engine = engine;
         // this.y = (CONSTANTS.CANVAS_HEIGHT / CONSTANTS.SCALE) - 20
         this.y = 12;
@@ -27,7 +30,9 @@ export default class InGameClock extends Entity {
         this.load();
         this.halted = false;
         this.isCookingMode = false;
-        this.isDisplayingWarning = false;
+        this.isDisplayingWarning = false; 
+        this.sprite = new Animator(ASSET_MANAGER.getAsset("/Assets/Player/InGameClock-Sheet.png"), 
+            0, 0, 64, 32, 19, 1, 0, false, false);
     }
 
     load() { // for when we work with persisting data. Loads the current day, etc.
@@ -161,8 +166,21 @@ export default class InGameClock extends Entity {
      */
     draw(ctx, engine) {
         ctx.fillStyle = "#000000";
-        ctx.fillText(
-            `Day ${this.dayCount} at (${this.getGameHour()} : ${this.getGameMinute()})     Game Time: ${Math.round(this.dayTime*100) / 100}
-            `, this.x, this.y);
+        this.sprite.drawFramePlain(ctx, this.x, this.y - 16, CONSTANTS.SCALE, 
+            this.getGameHour() - STARTING_HOUR
+        );
+        ctx.save()
+        ctx.font = "10px monospace";
+        ctx.fillText("Day", this.x + (6 * CONSTANTS.SCALE), this.y + 4)
+        const txtMetric = ctx.measureText(`${String(this.dayCount)}`);
+        ctx.fillText(`${String(this.dayCount)}`, this.x + (10 * CONSTANTS.SCALE) - (txtMetric.width / 2), this.y + 16)
+        ctx.font = "13px monospace";
+        ctx.fillText(`${String(this.getGameHour() % 12).padStart(2, '0')}:${String(Math.floor(this.getGameMinute() / 10) * 10).padStart(2, '0')} ${this.getGameHour() >= 12 ? 'PM': 'AM'}`, this.x + (24 * CONSTANTS.SCALE), this.y + 8)
+        if (CONSTANTS.DEBUG) {
+            ctx.fillText(
+                `Day ${this.dayCount} at (${this.getGameHour()} : ${this.getGameMinute()})     Game Time: ${Math.round(this.dayTime*100) / 100}
+                `, 200, 10);
+        }
+        ctx.restore();
     }
 }

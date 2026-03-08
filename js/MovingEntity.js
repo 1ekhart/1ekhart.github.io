@@ -150,10 +150,10 @@ export class Basan extends MovingEntity { // entity that should spawn a hitbox e
                 const player = engine.getPlayer();
                 if (player.x - this.x > 0) { // if player to the right
                     this.isRight = false;
-                    engine.addEntity(new FireHitbox(this.x + this.width, this.y - 16, 64, this.height, basanAttackLength, true));
+                    engine.addEntity(new FireHitbox(this.x + this.width + 16, this.y - 14, 64, this.height, basanAttackLength, this.isRight));
                 } else {
                     this.isRight = true;
-                    engine.addEntity(new FireHitbox(this.x, this.y - 16, 64, this.height, basanAttackLength, false));
+                    engine.addEntity(new FireHitbox(this.x, this.y - 14, 64, this.height, basanAttackLength, this.isRight));
                 }
                 this.xVelocity = 0;
                 this.isStopped = true;
@@ -206,11 +206,11 @@ class FireHitbox extends HitBox {
         super(x, y, width, height, timer)
         this.isFacingRight = isFacingRight;
         this.facingLeftOffset = 0;
-        if (!isFacingRight) {
+        if (isFacingRight) {
             this.x -= width;
-            this.facingLeftOffset = this.width / 2
+            this.facingLeftOffset = 5
         }
-        this.animation = new Animator(ASSET_MANAGER.getAsset("/Assets/Player/BladeEffect-Sheet.png"), 0, 0, 32, 32, 7, this.timer / 4, 0, false, false);
+        this.animation = new Animator(ASSET_MANAGER.getAsset("/Assets/Entities/BasanFireAttack-Sheet.png"), 0, 0, 32, 32, 7, this.timer / 4, 0, false, false);
     }
 
     update(engine) {
@@ -227,13 +227,13 @@ class FireHitbox extends HitBox {
     }
 
     draw(ctx, engine) {
-        // this.animation.drawFrame(CONSTANTS.TICK_TIME, ctx,
-            // this.x - engine.camera.x - this.facingLeftOffset, this.y - engine.camera.y - 20, !this.isFacingRight, 2);
+        this.animation.drawFrame(CONSTANTS.TICK_TIME, ctx,
+            this.x - engine.camera.x - this.facingLeftOffset, this.y - engine.camera.y - 5, !this.isFacingRight, 2);
 
-        // if (CONSTANTS.DEBUG == true) {
+        if (CONSTANTS.DEBUG == true) {
             ctx.strokeStyle = "#aa0000";
             ctx.strokeRect(Math.floor(this.x) - engine.camera.x, this.y - engine.camera.y, this.width, this.height);
-        // }
+        }
     }
 
 

@@ -66,9 +66,8 @@ export default class Customer extends EntityInteractable {
             // }
             // availableStation.assignOrder(this.order);
             this.orderTaken = true;
-            if (this.specificIngredient) {
+            if (this.ingredientID) {
                 this.prompt.changeText(`Order taken! Bring: ${this.recipeName} with ${this.ingredientName}`);
-
             } else {
                 this.prompt.changeText(`Order taken! Bring: ${this.recipeName}`);
             }
