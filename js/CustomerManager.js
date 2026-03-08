@@ -68,7 +68,6 @@ export default class CustomerManager {
         }
 
         const spot = this.spots[spotIndex];
-        // const order = RECIPES.Burger; // update later to handle different orders
         let recipeID = this.selectRandomDish();
         /**
         const randomOrder = {

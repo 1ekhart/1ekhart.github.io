@@ -28,24 +28,31 @@ export default class Customer extends EntityInteractable {
 
         this.orderTaken = false;
         this.orderCompleted = false;
+        this.availableStation = null;
         this.text = `Press E to take order: ${this.recipeName} with ${this.ingredientNames}`;
         this.interactionCooldown = interactionCooldown;
         console.log(this.text);
         this.prompt = new OnScreenTextSystem(this, x + width/2, y - 2, `${this.text}`, false);
 
-        this.waitTime = 90; // testing
+        this.waitTime = 20; // testing
         this.remainingTime = this.waitTime;
-        this.timerDisplay = new OnScreenTextSystem(this, x + width / 2, y - 17, this.formatTime(this.remainingTime), false);
+        this.timerDisplay = new OnScreenTextSystem(this, x + width / 2 + 10, y - 22, this.formatTime(this.remainingTime), false);
         
+        // ran out of time
         this.isAngry = false;
         this.angryDuration = 1.0;
         this.angryTimer = 0;
+
+        // completed order
+        this.isComplete = false;
+        this.completeDuration = 1.0;
+        this.completeTimer = 0;
 
         // sprite chat bubble
         this.chatBubbleSprite = new Animator(ASSET_MANAGER.getAsset("/Assets/Icons/OrderBubble.png"), 0, 0, 32, 34, 1, 1, 0);
         this.pendingBubbleSprite = new Animator(ASSET_MANAGER.getAsset("/Assets/Icons/PendingOrder.png"), 0, 0, 32, 34, 1, 1, 0);
         this.angryBubbleSprite = new Animator(ASSET_MANAGER.getAsset("/Assets/Icons/AngryOrder.png"), 0, 0, 32, 34, 1, 1, 0);
-        this.completeBubbleSprite = new Animator(ASSET_MANAGER.getAsset("/Assets/Icons/AngryOrder.png"), 0, 0, 32, 34, 1, 1, 0);
+        this.completeBubbleSprite = new Animator(ASSET_MANAGER.getAsset("/Assets/Icons/CompleteOrder.png"), 0, 0, 32, 34, 1, 1, 0);
 
         // sprite dish
         this.dishSprite = new Animator(ASSET_MANAGER.getAsset(getItemData(this.recipeItemID).assetName), 0, 0, getItemData(this.recipeItemID).width, getItemData(this.recipeItemID).height, 1, 1, 0);
@@ -60,12 +67,13 @@ export default class Customer extends EntityInteractable {
         this.interactionCooldown = interactionCooldown;
         // if order not taken yet -> take it
         if (!this.orderTaken) {
-            const availableStation = this.engine.stationManager.getAvailableStation();
-            if (!availableStation) {
+            //const availableStation = this.engine.stationManager.getAvailableStation();
+            this.availableStation = this.engine.stationManager.getAvailableStation();
+            if (!this.availableStation) {
                 console.log("No available cooking stations!");
                 return;
             }
-            availableStation.assignOrder(this.order);
+            this.availableStation.assignOrder(this.order);
             this.orderTaken = true;
             this.prompt.changeText(`Order taken! Bring: ${this.recipeName} with ${this.ingredientNames}`);
             this.prompt.showText();
@@ -77,7 +85,7 @@ export default class Customer extends EntityInteractable {
             return;
         }
 
-        // if order already takenaw -> try delivering
+        // if order already taken -> try delivering
         if (this.orderTaken && !this.orderCompleted) {
             const equippedItem = player.inventory.getEquippedItem();
             const playerInventory = player.inventory;
@@ -106,11 +114,11 @@ export default class Customer extends EntityInteractable {
                 // }
 
 
-                this.removeFromWorld = true;
-
-                if (this.onComplete) {
-                    this.onComplete();
-                }
+                //this.removeFromWorld = true;
+                this.isComplete = true;
+                this.completeTimer = this.completeDuration;
+                this.timerDisplay.removeFromWorld = true;
+                this.prompt.removeFromWorld = true;
 
                 console.log("Order delivered!");
             } else {
@@ -179,6 +187,18 @@ export default class Customer extends EntityInteractable {
             this.prompt.hideText();
         }
 
+        if (this.isComplete) {
+            this.completeTimer -= CONSTANTS.TICK_TIME;
+            if (this.completeTimer <= 0) {
+                this.removeFromWorld = true;
+                this.prompt.removeFromWorld = true;
+                this.timerDisplay.removeFromWorld = true;
+                if (this.onComplete) {
+                    this.onComplete();
+                }
+            }
+        }
+
         if (this.orderTaken && !this.orderCompleted) {
             this.remainingTime -= CONSTANTS.TICK_TIME;
             if (this.remainingTime <= 0 && !this.isAngry) {
@@ -192,6 +212,11 @@ export default class Customer extends EntityInteractable {
                 if (this.angryTimer <= 0) {
                     this.removeFromWorld = true;
                     this.timerDisplay.removeFromWorld = true;
+                    // reset station when customer leaves
+                    if(this.availableStation != null) {
+                        this.availableStation.reset();
+                    }
+
                     if (this.onComplete) this.onComplete();
                     console.log("Customer left due to timeout!");
                 }
@@ -213,6 +238,8 @@ export default class Customer extends EntityInteractable {
         let bubbleToDraw;
         if (this.isAngry) {
             bubbleToDraw = this.angryBubbleSprite;
+        } else if (this.isComplete) {
+            bubbleToDraw = this.completeBubbleSprite;
         } else if (this.orderTaken) {
             bubbleToDraw = this.pendingBubbleSprite;
         } else {
@@ -223,8 +250,8 @@ export default class Customer extends EntityInteractable {
         // dish
         const dishScale = 20 / getItemData(this.recipeItemID).width;
         const dishX = bubbleX + (32 - 20) / 2;
-        const dishY = bubbleY + (34 - 22) / 2;
-        if (!this.isAngry) {
+        const dishY = bubbleY + (32 - 20) / 2;
+        if (!this.isAngry && !this.isComplete) {
             this.dishSprite.drawFramePlain(ctx, dishX, dishY, dishScale);
         }
     }
