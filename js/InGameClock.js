@@ -96,6 +96,7 @@ export default class InGameClock extends Entity {
             save.money = 0;
             this.engine.getPlayer().inventory.money = 0;
             this.engine.addUIEntity(new DialogueBox(this.engine, "Oh no! Rent was due and the landlord took all the money, you can still play though, or make a new save and try again"))
+            save.syncData();
         } else if (this.dayCount == 7) {
             this.engine.addUIEntity(new DialogueBox(this.engine, "Congrats! You didn't go bankrupt! You can keep playing and try to get as much money as you can!"))
         }
