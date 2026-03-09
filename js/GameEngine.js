@@ -241,7 +241,7 @@ export default class GameEngine {
         let entitiesCount = ENTITY_LAYER_COUNT;
 
         //iterate through all layers
-        for (let i = 0; i < entitiesCount; i++) {
+        for (let i = entitiesCount - 1; i >= 0; i--) {
             const entityLayer = this.entities[i];
 
             if (!entityLayer) {

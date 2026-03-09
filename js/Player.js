@@ -17,6 +17,7 @@ const GRAVITY = 0.6;
 const ATTACK_COOLDOWN = secondsToTicks(0.3);
 const MAX_HEALTH = 100;
 const INVINCIBILITY_DURATION = secondsToTicks(1.2);
+const WARNING_DURATION = secondsToTicks(4);
 const SQUAT_FRAMES = 3;
 
 export default class Player extends WorldEntity {
@@ -43,6 +44,13 @@ export default class Player extends WorldEntity {
         this.attack = null;
         this.squatTimer = 0;
         this.bufferedJump = false;
+
+        this.warningUIx = (CONSTANTS.CANVAS_WIDTH / CONSTANTS.SCALE) / 3;
+        this.warningUIWidth = (CONSTANTS.CANVAS_WIDTH / CONSTANTS.SCALE) / 3;
+        this.warningUIy = (CONSTANTS.CANVAS_HEIGHT / CONSTANTS.SCALE) / 18;
+        this.warningTimer = 0;
+        this.warningText = "";
+        this.warningLines = [];
     }
 
     save(saveObject) { // saves the inventory list for now
@@ -53,15 +61,15 @@ export default class Player extends WorldEntity {
         this.animations = [];
         this.animations["Idle"] = new Animator(ASSET_MANAGER.getAsset("/Assets/Player/IdleRun-Sheet.png"), 0, 0, 32, 32, 2, 1, 0, false, true);
 
-        this.animations["Run"] = new Animator(ASSET_MANAGER.getAsset("/Assets/Player/IdleRun-Sheet.png"), 0, 32, 32, 32, 6, .25, 0, false, true);
+        this.animations["Run"] = new Animator(ASSET_MANAGER.getAsset("/Assets/Player/IdleRun-Sheet.png"), 0, 32, 32, 32, 6, .12, 0, false, true);
 
-        this.animations["IdleAttack"] = new Animator(ASSET_MANAGER.getAsset("/Assets/Player/IdleRun-Sheet.png"), 0, 64, 32, 32, 6, .1, 0, false, false);
+        this.animations["IdleAttack"] = new Animator(ASSET_MANAGER.getAsset("/Assets/Player/IdleRun-Sheet.png"), 0, 64, 32, 32, 6, .05, 0, false, false);
 
         this.animations["Squat"] = new Animator(ASSET_MANAGER.getAsset("/Assets/Player/IdleRun-Sheet.png"), 0, 96, 32, 32, 1, 1, 0, false, true);
 
         this.animations["Jump"] = new Animator(ASSET_MANAGER.getAsset("/Assets/Player/IdleRun-Sheet.png"), 0, 128, 32, 32, 4, .25, 0, false, true);
 
-        this.animations["AirAttack"] = new Animator(ASSET_MANAGER.getAsset("/Assets/Player/IdleRun-Sheet.png"), 0, 160, 32, 32, 6, .1, 0, false, false);
+        this.animations["AirAttack"] = new Animator(ASSET_MANAGER.getAsset("/Assets/Player/IdleRun-Sheet.png"), 0, 160, 32, 32, 6, .05, 0, false, false);
     }
 
     setAnimationState(state) {
@@ -117,6 +125,10 @@ export default class Player extends WorldEntity {
         if (this.attack !== null) {
             if (this.attack.removeFromWorld == true) {
                 this.attack = null;
+                if (!this.onGround) {
+                    this.haltMovement = true; this.attackCooldown = ATTACK_COOLDOWN / 2
+                    console.log("Cooldown After Attack = " + this.attackCooldown)
+                }
             } else {
                 this.attack.x = this.isRight? this.x + this.width + 10 : this.x - this.width - 10 - 32;
                 this.onGround? this.attack.y = this.y - 10 : this.attack.y = this.y + 10;
@@ -124,26 +136,38 @@ export default class Player extends WorldEntity {
 
         }
 
-        if(this.attackCooldown > 0) this.attackCooldown -= 1;
+        this.warningTimer -= 1;
+        if (this.warningTimer <= 0) {
+            this.warningText = null;
+        }
+
+        // if(this.attackCooldown > 0) {
+            this.attackCooldown -= 1;
+        // }
     }
 
     tryAttack() {
-        if (engine.input.click && this.attackCooldown <= 0) {
+        if (this.haltMovement == false && engine.input.click && this.attackCooldown <= 0 && this.inventory.getEquippedSlot() === null) {
             if (this.onGround) {
                 this.setAnimationState("IdleAttack")
             } else {
                 this.setAnimationState("AirAttack")
+                console.log("Cooldown = " + this.attackCooldown);
             }
             this.haltMovement = true;
             this.squat = null;
-            this.attackCooldown = ATTACK_COOLDOWN;
             if (this.onGround) { // spawn it with respect to width and height if facing right
+                this.attackCooldown = ATTACK_COOLDOWN * 2;
                 this.attack = new BladeHitbox(this.isRight? this.x + this.width + 10 : this.x - 10, this.y - 10, 58, 58, ATTACK_COOLDOWN, this.isRight);
             } else {
+                this.attackCooldown = ATTACK_COOLDOWN * 1.5;
                 this.attack = new AerialBladeHitbox(this.isRight? this.x + this.width + 10: this.x - 10, this.y / this.height, 58, 32, ATTACK_COOLDOWN, this.isRight);
             }
             engine.addEntity(this.attack);
         }
+        // if (this.inventory.getEquippedSlot != null) {
+        //     this.displayPlayerWarning("Cannot attack while holding an item, please deselect!");
+        // }
     }
 
     reduceHealth(amt) {
@@ -188,9 +212,10 @@ export default class Player extends WorldEntity {
         }
 
         if (this.haltMovement == false) {
-            if (engine.input.click && this.inventory.getEquippedSlot() === null) {
-                this.tryAttack();
-            } else if (engine.input.left) {
+            // if (engine.input.click && this.inventory.getEquippedSlot() === null) {
+            //     this.tryAttack();
+            //} 
+            if (engine.input.left) {
                 if (this.onGround) this.setAnimationState("Run");
                 this.isRight = false;
             } else if (engine.input.right) {
@@ -240,6 +265,25 @@ export default class Player extends WorldEntity {
             ctx.strokeRect(floor(this.x) - engine.camera.x, this.y - engine.camera.y, this.width, this.height);
         }
 
+        if (this.warningTimer > 0) {
+            // console.log(this.warningText)
+            ctx.save()
+            ctx.font = "10px monospace";
+            ctx.fillStyle = "rgb(219, 100, 100)"
+            ctx.strokeStyle = "rgba(40, 40, 40, 0.62)"
+
+            const fontHeight = 10;
+            let textX = this.warningUIx + (this.warningUIWidth / 2);
+            let textY = this.warningUIy;
+            for (let i = 0; i < this.warningLines.length; i++) {
+                ctx.fillText(this.warningLines[i], textX - (ctx.measureText(this.warningLines[i]).width / 2), textY)
+                textY += fontHeight;
+            }
+            // ctx.strokeText(this.warningText, this.warningUIx, this.warningUIy)
+            // ctx.fillText(this.warningText, this.warningUIx, this.warningUIy);
+            ctx.restore()
+        }
+
         if (!this.onGround) {
             if (this.attack) {
                 this.animations[this.animationState].drawFrame(deltaTime, ctx,
@@ -263,6 +307,33 @@ export default class Player extends WorldEntity {
         } else {
             return Math.abs(this.yVelocity) <= Math.abs(JUMPING_STRENGTH * 3/4)? 2 : 3; // if the y velocity is high, then  do the freefall frame;
         }
+    }
+
+    displayPlayerWarning(Text, override) {
+        if (this.warningTimer > 0 && !override) {
+            return;
+        }
+        console.log(Text);
+        const ctx = CONSTANTS.CONTEXT;
+        this.warningText = Text;
+        this.warningTimer = WARNING_DURATION;
+        // console.log("Warning Timer: " + this.warningTimer + ", Text: " + this.warningText)
+        
+        let words = Text.split(' ');
+        let line = '';
+        let lines = [];
+
+        for (let i = 0; i < words.length; i++) {
+            let sampleLine = line + words[i] + " ";
+            if (ctx.measureText(sampleLine).width > this.warningUIWidth) {
+                lines.push(line.slice(0, -1));
+                line = words[i] + ' ';
+            } else {
+                line = sampleLine;
+            }
+        }
+        lines.push(line.slice(0, -1));
+        this.warningLines = lines;
     }
 
     goDefaultState() {

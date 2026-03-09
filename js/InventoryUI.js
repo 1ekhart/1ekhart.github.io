@@ -133,6 +133,7 @@ export default class InventoryUI {
         const y = click.y / CONSTANTS.SCALE;
 
         if (this.handleBackpackClick(click)) {
+            engine.input.click = null;
             return true;
         }
 
@@ -142,6 +143,7 @@ export default class InventoryUI {
             this.mouseDownPos = { x, y };
             this.draggedSlotIndex = slotIndex;
             this.isDragging = false;
+            engine.input.click = null;
             return true;
         }
         return false;

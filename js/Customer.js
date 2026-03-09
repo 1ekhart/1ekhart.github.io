@@ -27,10 +27,11 @@ export default class Customer extends EntityInteractable {
         if (order.specificIngredient) {
             this.ingredientID = order.specificIngredient;
             this.ingredientName = getItemData(this.ingredientID).name;
-            this.text = `${this.recipeName} with ${this.ingredientName}`;
+            // this.text = `${this.recipeName} with ${this.ingredientName}`;
         } else {
-            this.text = `${this.recipeName}`;
+            // this.text = `${this.recipeName}`;
         }
+        this.text = "Press E to take order or F to refuse"
         this.orderTaken = false;
         this.orderCompleted = false;
         this.interactionCooldown = INTERACTION_COOLDOWN;

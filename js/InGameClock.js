@@ -103,6 +103,7 @@ export default class InGameClock extends Entity {
         const player = this.engine.getPlayer();
         player.health = player.maxHealth;
         this.engine.getLevel().teleport(3, 30, 15.5);
+        this.isDisplayingWarning = false;
     }
 
     skipToCookingMode() {
@@ -128,19 +129,28 @@ export default class InGameClock extends Entity {
                 this.dayTimeTicks = HOUR_LENGTH * STARTING_HOUR;
                 this.dayCount += 1;
                 this.handleEndOfDay(engine)
-            } else if (this.dayTimeTicks >= MODE_SWITCH_HOUR * HOUR_LENGTH) { // handle switching to cooking mode
+            } else if (!this.isCookingMode && this.dayTimeTicks >= MODE_SWITCH_HOUR * HOUR_LENGTH) { // handle switching to cooking mode
                 this.handleModeSwitch(engine);
+                this.isDisplayingWarning = false;
             } else if (this.dayCount <= 1 && !this.isDisplayingWarning && (this.dayTimeTicks >= (MODE_SWITCH_HOUR - 1) * HOUR_LENGTH)) { // give a warning when close to mode switch
                 console.log("It's almost time to open up shop! Gather as much ingredients before the time runs out!")
                 this.isDisplayingWarning = true;
                 engine.addUIEntity(new DialogueBox(engine, "It's almost time to open up shop! Gather as much ingredients before the time runs out!"));
+            } else if (this.isCookingMode && this.getGameHour() == 23) {
+                this.isDisplayingWarning = true;
+                engine.getPlayer().displayPlayerWarning("1 hour until you have to close and go to sleep!", true)
+            } else if (!this.isDisplayingWarning && this.dayTimeTicks >= (MODE_SWITCH_HOUR - 1) * HOUR_LENGTH) {
+                this.isDisplayingWarning = true;
+                engine.getPlayer().displayPlayerWarning("1 hour until you're forced to open the shop!", true)
+            } else if (this.displayPlayerWarning) {
+                console.log("is 23:00? " + this.getGameHour())
+                engine.getPlayer().displayPlayerWarning("Not Display Warning")
             }
-
         }
     }
 
     handleModeSwitch(engine) {
-        if (this.isCookingMode) { return;}
+        if (this.isCookingMode) { this.isDisplayingWarning = false; return;}
         // handle saving the entities placed during the outdoor section
         const save = engine.getSaveObject();
         engine.entities.forEach(function (entitylist) { // call the save but don't sync data just yet.

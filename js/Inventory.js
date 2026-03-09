@@ -154,6 +154,8 @@ export default class Inventory {
             engine.getLevel().sceneEntities.push(newPlant);
             engine.addEntity(newPlant);
         } else {
+            // console.log("Cannot use this item!")
+            player.displayPlayerWarning("Cannot attack while holding an item, please deselect!")
             return; // don't remove items that have no use action
         }
 
