@@ -98,7 +98,14 @@ const Croquettes = {
             hasSpecificIngredient: false,
             category: "Meat"
         }
-    }
+    },
+    steps: [
+        { type: "ingredients"},
+        { type: "chop", duration: 120},
+        { type: "mix", duration: 60},
+        { type: "cook", duration: 120},
+        { type: "assemble", duration: 60}
+    ]
 }
 
 const FriedPumpkin = {
@@ -113,7 +120,13 @@ const FriedPumpkin = {
             hasSpecificIngredient: true,
             eligibleIngredients: [7]
         }
-    }
+    },
+    steps: [
+        { type: "ingredients"},
+        { type: "mix", duration: 60},
+        { type: "cook", duration: 120},
+        { type: "assemble", duration: 60}
+    ]
 }
 
 export const recipeList = {

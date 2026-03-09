@@ -7,7 +7,6 @@ import Oven from "/js/Oven.js";
 import PrepStation from "/js/PrepStation.js";
 import ChoppingStation from "/js/ChoppingStation.js";
 import MixingStation from '/js/MixingStation.js';
-import { CONSTANTS } from '/js/Util.js';
 import Customer from '/js/Customer.js';
 import { RECIPES } from '/js/Data/Recipes.js';
 import { CONSTANTS, secondsToTicks } from '/js/Util.js';

@@ -8,8 +8,9 @@ import Player from "/js/Player.js";
 import { CONSTANTS, secondsToTicks } from "/js/Util.js";
 
 const INTERACTION_COOLDOWN = secondsToTicks(0.5);
-const WAIT_TIME = secondsToTicks(18);
+const WAIT_TIME = secondsToTicks(25);
 const ANGRY_DURATION = secondsToTicks(1);
+const COMPLETE_DURATION = secondsToTicks(1);
 
 export default class Customer extends EntityInteractable {
     constructor(x, y, width, height, order, engine) {
@@ -33,14 +34,15 @@ export default class Customer extends EntityInteractable {
         this.orderCompleted = false;
         this.availableStation = null;
         this.text = `Press E to take order: ${this.recipeName} with ${this.ingredientNames}`;
-        this.interactionCooldown = interactionCooldown;
+        //this.interactionCooldown = interactionCooldown;
         console.log(this.text);
-        //this.interactionCooldown = INTERACTION_COOLDOWN;
+        this.interactionCooldown = INTERACTION_COOLDOWN;
         this.prompt = new OnScreenTextSystem(this, x + width/2, y - 2, `${this.text}`, false);
 
-        this.waitTime = 25; // testing
-        this.remainingTime = this.waitTime;
-        this.timerDisplay = new OnScreenTextSystem(this, x + width / 2 + 10, y - 22, this.formatTime(this.remainingTime), false);
+        //this.waitTime = WAIT_TIME; // testing
+        this.remainingTicks = WAIT_TIME;
+        //this.remainingTime = this.waitTime;
+        this.timerDisplay = new OnScreenTextSystem(this, x + width / 2 + 10, y - 22, this.formatTime(this.remainingTicks), false);
         
         // ran out of time
         this.isAngry = false;
@@ -49,7 +51,7 @@ export default class Customer extends EntityInteractable {
 
         // completed order
         this.isComplete = false;
-        this.completeDuration = 1.0;
+        this.completeDuration = COMPLETE_DURATION;
         this.completeTimer = 0;
 
         // sprite chat bubble
@@ -175,7 +177,7 @@ export default class Customer extends EntityInteractable {
         }
 
         if (this.isComplete) {
-            this.completeTimer -= CONSTANTS.TICK_TIME;
+            this.completeTimer -= 1;
             if (this.completeTimer <= 0) {
                 this.removeFromWorld = true;
                 this.prompt.removeFromWorld = true;
@@ -239,7 +241,7 @@ export default class Customer extends EntityInteractable {
 
         // dish
         const dishScale = 20 / getItemData(this.recipeItemID).width;
-        const dishScale = 20 / getItemData(this.recipeItemID).width;
+        //const dishScale = 20 / getItemData(this.recipeItemID).width;
         const dishX = bubbleX + (32 - 20) / 2;
         const dishY = bubbleY + (32 - 20) / 2;
         if (!this.isAngry && !this.isComplete) {
