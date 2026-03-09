@@ -137,6 +137,7 @@ export default class Customer extends EntityInteractable {
     refuseOrder(player) {
         // if (this.orderTaken) {return;}
         this.removeFromWorld = true;
+        if (this.availableStation != null) this.availableStation.reset();
         if (this.onComplete) this.onComplete();
     }
 
