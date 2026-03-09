@@ -31,7 +31,7 @@ export default class OnScreenTextSystem extends Entity {
     changeText(newText) {
         this.text = newText;
     }
-    
+
     update(engine) {
         if (this.parent.removeFromWorld == true) {
             this.removeFromWorld = true;
@@ -47,12 +47,10 @@ export default class OnScreenTextSystem extends Entity {
             return;
         }
         const width = ctx.measureText(this.text).width;
-        ctx.save();
         ctx.fillStyle = "#ffffff"
         ctx.strokeStyle = "rgba(0, 0, 0, 0.63)"
         ctx.font = this.font;
         ctx.strokeText(this.text, this.x - (width/2) - engine.camera.x, this.y - engine.camera.y);
         ctx.fillText(this.text, this.x - (width/2) - engine.camera.x, this.y - engine.camera.y);
-        ctx.restore();
     }
 }

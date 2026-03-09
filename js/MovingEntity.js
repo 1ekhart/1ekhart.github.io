@@ -127,7 +127,7 @@ export default class MovingEntity extends WorldEntity {
     draw(ctx, engine) {
         ctx.fillStyle = "#00ffff";
         ctx.fillRect(this.x - engine.camera.x, this.y - engine.camera.y, this.width, this.height);
-        ctx.fillText(`HP: ${this.health}/${this.maxHealth}`, this.x - engine.camera.x, this.y - 14 - engine.camera.y);
+        // ctx.fillText(`HP: ${this.health}/${this.maxHealth}`, this.x - engine.camera.x, this.y - 14 - engine.camera.y);
     }
 }
 
@@ -197,10 +197,10 @@ export class Basan extends MovingEntity { // entity that should spawn a hitbox e
                 const player = engine.getPlayer();
                 if (player.x - this.x > 0) { // if player to the right
                     this.isRight = false;
-                    engine.addEntity(new FireHitbox(this.x + this.width, this.y - 16, 64, this.height, BASAN_ATTACK_LENGTH, true));
+                    engine.addEntity(new FireHitbox(this.x + this.width + 16, this.y - 14, 64, this.height, BASAN_ATTACK_LENGTH, this.isRight));
                 } else {
                     this.isRight = true;
-                    engine.addEntity(new FireHitbox(this.x, this.y - 16, 64, this.height, BASAN_ATTACK_LENGTH, false));
+                    engine.addEntity(new FireHitbox(this.x, this.y - 14, 64, this.height, BASAN_ATTACK_LENGTH, this.isRight));
                 }
                 this.xVelocity = 0;
                 this.isStopped = true;
@@ -239,12 +239,11 @@ export class Basan extends MovingEntity { // entity that should spawn a hitbox e
         this.animations[this.animationState].drawFrame(deltaTime, ctx,
             this.x - engine.camera.x - 10, this.y - engine.camera.y - 16, !this.isRight, 2
         )
-        ctx.fillStyle = "rgb(0, 0, 0)"
-        ctx.fillText(`HP: ${this.health}/${this.maxHealth}`, this.x - engine.camera.x - 15, this.y - 14 - engine.camera.y);
+        // ctx.fillStyle = "rgb(0, 0, 0)"
+        // ctx.fillText(`HP: ${this.health}/${this.maxHealth}`, this.x - engine.camera.x - 15, this.y - 14 - engine.camera.y);
         if (CONSTANTS.DEBUG) {
             ctx.strokeStyle = "#00ffff";
             ctx.strokeRect(this.x - engine.camera.x, this.y - engine.camera.y, this.width, this.height);
-
         }
     }
 }
@@ -254,12 +253,12 @@ class FireHitbox extends HitBox {
         super(x, y, width, height, timer)
         this.isFacingRight = isFacingRight;
         this.facingLeftOffset = 0;
-        if (!isFacingRight) {
+        if (isFacingRight) {
             this.x -= width;
-            this.facingLeftOffset = this.width / 2
+            this.facingLeftOffset = 5
         }
         const animationTime = (this.timer / 4) / CONSTANTS.TICKS_PER_SECOND;
-        this.animation = new Animator(ASSET_MANAGER.getAsset("/Assets/Player/BladeEffect-Sheet.png"), 0, 0, 32, 32, 7, animationTime, 0, false, false);
+        this.animation = new Animator(ASSET_MANAGER.getAsset("/Assets/Entities/BasanFireAttack-Sheet.png"), 0, 0, 32, 32, 7, animationTime, 0, false, false);
     }
 
     update(engine) {
@@ -277,12 +276,12 @@ class FireHitbox extends HitBox {
 
     draw(ctx, engine, deltaTime) {
         this.animation.drawFrame(deltaTime, ctx,
-            this.x - engine.camera.x - this.facingLeftOffset, this.y - engine.camera.y - 20, !this.isFacingRight, 2);
+            this.x - engine.camera.x - this.facingLeftOffset, this.y - engine.camera.y - 5, !this.isFacingRight, 2);
 
-        // if (CONSTANTS.DEBUG == true) {
+        if (CONSTANTS.DEBUG == true) {
             ctx.strokeStyle = "#aa0000";
             ctx.strokeRect(Math.floor(this.x) - engine.camera.x, this.y - engine.camera.y, this.width, this.height);
-        // }
+        }
     }
 
 

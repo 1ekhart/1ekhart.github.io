@@ -470,20 +470,17 @@ export default class CookingStationUI extends Entity {
         ctx.fillStyle = cookingStationBGColor;
         ctx.fillRect(this.x, this.y, this.width, this.height, (2 * CONSTANTS.SCALE));
         if (this.recipeName) {
-            ctx.save()
             ctx.font = "20px monospace";
             ctx.fillStyle = "rgb(0, 0, 0)"
             const txtMetrics = ctx.measureText(this.recipeName);
             ctx.fillText(this.recipeName, this.x + (this.width / 3) - (txtMetrics.width / 2), this.y + (this.height / 6))
-            ctx.restore();
         }
         if (this.ingredientList) {
-            ctx.save()
             ctx.font = "9px monospace";
             ctx.fillStyle = "rgb(0, 0, 0)"
             const txtMetrics = ctx.measureText(this.ingredientList);
             ctx.fillText(this.ingredientList, this.x + (this.width / 3) - (txtMetrics.width / 2), this.y + (this.height / 6) + 15)
-            ctx.restore();
         }
+        ctx.font = "12px monospace";
     }
 }

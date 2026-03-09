@@ -88,10 +88,6 @@ export default class Button {
         ctx.strokeRect(this.x, this.y, this.width, this.height);
 
         ctx.fillStyle = this.textColor;
-        // const txtMetrics = ctx.measureText(this.text);
-        // const width = txtMetrics.width;
-        // const height = txtMetrics.actualBoundingBoxAscent;
-        // ctx.fillText(this.text, this.x - (width / 2) + (this.width / 2), this.y + (this.height / 2) + (height / 2))
 
         let textX = this.x + (this.width / 2);
         let textY = this.txtStartHeight - (this.fontHeight * (this.lines.length - 1) / 2);

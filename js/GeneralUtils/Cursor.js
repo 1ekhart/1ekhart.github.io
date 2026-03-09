@@ -36,13 +36,12 @@ export default class Cursor {
         if (engine.mouse) {
             this.mouseSprites.drawFramePlain(ctx, this.x, this.y, 1, this.spriteNum);
             if (this.hoverTextShown) {
-                ctx.save();
                 ctx.font = '8px monospace';
                 ctx.fillStyle = "rgb(151, 255, 255)"
                 ctx.strokeStyle = "rgb(0, 0, 0)"
                 ctx.strokeText(this.hoverText, this.x, this.y - textVerticalOffset);
                 ctx.fillText(this.hoverText, this.x, this.y - textVerticalOffset);
-                ctx.restore();
+                ctx.font = "12px monospace";
             }
             if (CONSTANTS.DEBUG) {
                 ctx.strokeStyle = "#aa0000";
