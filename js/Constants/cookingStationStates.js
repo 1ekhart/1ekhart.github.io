@@ -11,6 +11,7 @@ export const STATION_STATE = {
 export const STEP_TYPE = {
     INGREDIENTS: "ingredients",
     COOK: "cook",
+    FRY: "fry",
     ASSEMBLE: "assemble",
     CHOP: "chop",
     MIX: "mix"

@@ -30,7 +30,7 @@ export default class CookingStation {
             return false;
         }
         this.currentOrder = order;
-        this.ingredients = order.ingredients;
+        this.ingredient = order.specificIngredient;
 
         //this.cookTime = order.cookTime || 0;
         //this.assembleTime = order.assembleTime || 0;
@@ -56,7 +56,7 @@ export default class CookingStation {
         return this.state === STATION_STATE.STEP_COMPLETE && step.type === stepType;
     }
 
-    hasExactIngredients(selectedIngredients) {
+    hasExactIngredients(selectedIngredients, recipeID) {
         if (!this.currentOrder || !selectedIngredients) return false;
         /*
         const required = [...this.currentOrder.ingredients];
@@ -72,14 +72,17 @@ export default class CookingStation {
         }*/
 
         
-        const required = [...this.currentOrder.ingredients];
+        // const required = [...this.currentOrder.ingredients];
         const supplied = [...selectedIngredients];
 
-        if (required.length !== supplied.length) return false;
-
-        for (let i = 0; i < required.length; i++) {
-            if (!supplied.includes(required[i])) return false;
+        if (this.currentOrder.recipeID !== recipeID) return false;
+        if (this.ingredient && !supplied.includes(this.ingredient)) {
+            return false;
         }
+
+        // for (let i = 0; i < required.length; i++) {
+        //     if (!supplied.includes(required[i])) return false;
+        // }
        /*
         const recipe = getRecipeData(this.currentOrder.recipeID);
         if (!recipe) return false;
@@ -115,9 +118,9 @@ export default class CookingStation {
         return true;
     }
 
-    supplyIngredients(selectedIngredients) {
+    supplyIngredients(selectedIngredients, recipeID) {
         if (!this.canHandleStep(STEP_TYPE.INGREDIENTS)) return false;
-        if (!this.hasExactIngredients(selectedIngredients)) {
+        if (!this.hasExactIngredients(selectedIngredients, recipeID)) {
             console.log("Ingredients do not match order!");
             return false;
         }
@@ -229,7 +232,7 @@ export default class CookingStation {
     reset() {
         this.state = STATION_STATE.IDLE;
         this.currentOrder = null;
-        this.ingredients = [];
+        this.ingredient = null;
         this.cookQuality = 1.0;
         this.currentStepIndex = 0;
 

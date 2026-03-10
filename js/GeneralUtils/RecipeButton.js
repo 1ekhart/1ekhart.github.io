@@ -218,9 +218,9 @@ export default class RecipeButton { // like button but with some added features
 
     addRecipeToPlayer(engine) {
         console.log("=== FINAL STATION CHECK ===");
-        console.log("Station expects:", this.parent.parent.station.currentOrder.ingredients);
+        console.log("Station expects:", this.parent.parent.station.currentOrder.ingredient);
         console.log("Player selected:", this.requestedIngredients);
-        if (!this.parent.parent.station.hasExactIngredients(this.requestedIngredients)) {
+        if (!this.parent.parent.station.hasExactIngredients(this.requestedIngredients, this.recipeID)) {
             console.log("Selected ingredients do not match the stations order!");
             return;
         }
@@ -246,13 +246,14 @@ export default class RecipeButton { // like button but with some added features
             ingredients: this.requestedIngredients.slice()
         });*/
 
-        this.parent.parent.station.supplyIngredients(this.requestedIngredients);
+        this.parent.parent.station.supplyIngredients(this.requestedIngredients, this.recipeID);
 
         that.parent.refreshIngredientData();
 
         if (that.parent.parent) {
             that.parent.parent.closeUI();
         }
+        engine.getClock().resumeTime();
     }
 
 

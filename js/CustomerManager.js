@@ -69,17 +69,16 @@ export default class CustomerManager {
 
         const spot = this.spots[spotIndex];
         let recipeID = this.selectRandomDish();
-        /**
         const randomOrder = {
             recipeID: recipeID,
             specificIngredient: this.generateRandomRecipe(recipeID)
-        }*/
-        const ingredientArray = this.buildIngredientArray(recipeID);
-        const randomOrder = {
-            recipeID: recipeID,
-            ingredients: ingredientArray
-        };
-        console.log(randomOrder);
+        }
+        // const ingredientArray = this.buildIngredientArray(recipeID);
+        // const randomOrder = {
+        //     recipeID: recipeID,
+        //     ingredients: ingredientArray
+        // };
+        // console.log(randomOrder);
 
         const customer = new Customer (spot.x, spot.y, 16, 32, randomOrder, this.engine);
 

@@ -5,6 +5,7 @@ import Player from '/js/Player.js';
 import Item from '/js/Item.js';
 import { randomIntRange, CONSTANTS } from '/js/Util.js';
 import { STATION_STATE, STEP_TYPE } from '/js/Constants/cookingStationStates.js';
+import Animator from '/js/GeneralUtils/Animator.js';
 
 const idleColor = "#fbbf7c";
 const chopColor = "#c5785a";
@@ -31,6 +32,7 @@ export default class ChoppingStation extends EntityInteractable {
 
         this.prompt = new OnScreenTextSystem(this, this.x + (width / 2), this.y - (height / 4), "Press E to chop ingredients", false);
         this.timer = new OnScreenTextSystem(this, this.x + (width / 2), this.y - (height / 4), "", false);
+        this.sprite = new Animator(ASSET_MANAGER.getAsset("/Assets/Entities/PrepStations-Sheet.png"), 32, 0, 16, 32, 1, 1, 0, false, false);
         engine.addEntity(this.prompt);
         engine.addEntity(this.timer);
     }
@@ -100,9 +102,10 @@ export default class ChoppingStation extends EntityInteractable {
      * @param {GameEngine} engine
      */
     draw(ctx, engine) {
-        ctx.fillStyle = this.color;
-        ctx.fillRect((this.x - engine.camera.x) + (this.width / 4), (this.y - engine.camera.y) + (this.height / 4),
-        this.width / 2, this.height / 2);
+        // ctx.fillStyle = this.color;
+        // ctx.fillRect((this.x - engine.camera.x) + (this.width / 4), (this.y - engine.camera.y) + (this.height / 4),
+        // this.width / 2, this.height / 2);
+        this.sprite.drawFramePlain(ctx, this.x - engine.camera.x, this.y - engine.camera.y - 16, 2);
         if (CONSTANTS.DEBUG == true) {
             ctx.strokeStyle = "#aa0000";
             ctx.strokeRect(Math.floor(this.x - engine.camera.x), Math.floor(this.y - engine.camera.y), this.width, this.height);

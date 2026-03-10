@@ -5,6 +5,8 @@ import { STATION_STATE, STEP_TYPE } from "/js/Constants/cookingStationStates.js"
 import { getItemData } from "/js/DataClasses/ItemList.js";
 import { getRecipeData } from "/js/DataClasses/RecipeList.js";
 import CookingStationUI from '/js/GeneralUtils/CookingUI.js';
+import Entity from "/js/AbstractClasses/Entity.js";
+import Animator from "/js/GeneralUtils/Animator.js";
 
 const idleColor = "#7D7F7C";
 const assemblingColor = "#FFA500";
@@ -28,6 +30,7 @@ export default class PrepStation extends EntityInteractable {
         this.prompt = new OnScreenTextSystem(this, (this.x + width / 2), (this.y - height / 4), "Press E to Assemble", false);
         this.ingredientText = new OnScreenTextSystem(this, (this.x + width / 2), (this.y - height / 2 - 10), "", false)
         this.timer = new OnScreenTextSystem(this, (this.x + width / 2), (this.y - height / 4), "0.0" + Math.ceil(this.assemblyTime / 60), false);
+        this.sprite = new Animator(ASSET_MANAGER.getAsset("/Assets/Entities/PrepStations-Sheet.png"), 0, 0, 16, 32, 1, 1, 0, false, false);
 
         this.ingredients = [];
         this.currentIngredientIndex = 0;
@@ -101,6 +104,7 @@ export default class PrepStation extends EntityInteractable {
             if (!this.displayingUI) {
                 this.displayingUI = true;
                 this.cookingUI = new CookingStationUI(this.engine, this, this.station);
+                this.engine.getClock().stopTime();
                 this.engine.addEntity(this.cookingUI, 4);
             }
             return;
@@ -141,11 +145,25 @@ export default class PrepStation extends EntityInteractable {
     }
 
     draw(ctx, engine) {
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x - engine.camera.x, this.y - engine.camera.y, this.width, this.height);
+        // ctx.fillStyle = this.color;
+        // ctx.fillRect(this.x - engine.camera.x, this.y - engine.camera.y, this.width, this.height);
+        this.sprite.drawFramePlain(ctx, this.x - engine.camera.x, this.y - engine.camera.y  - 16, 2);
         if (engine.CONSTRAINTS?.DEBUG) {
             ctx.strokeStyle = "#AA0000";
             ctx.strokeRect(this.x - engine.camera.x, this.y - engine.camera.y, this.width, this.height);
         }
+    }
+}
+
+export class EmptyStation extends Entity {
+    constructor(x, y) {
+        super();
+        this.x = x;
+        this.y = y; 
+        this.sprite = new Animator(ASSET_MANAGER.getAsset("/Assets/Entities/PrepStations-Sheet.png"), 48, 0, 16, 32, 1, 1, 0, false, false);
+    }
+
+    draw(ctx, engine) {
+        this.sprite.drawFramePlain(ctx, this.x - engine.camera.x, this.y - engine.camera.y - 32, 2);
     }
 }

@@ -35,10 +35,11 @@ export default class StationIndicator {
 }
 
 // helper for station indicator
-export function createStationMap(prep, oven, chop, mix) {
+export function createStationMap(prep, oven, chop, mix, fry) {
     return {
         [STEP_TYPE.INGREDIENTS]: prep,
         [STEP_TYPE.COOK]: oven,
+        [STEP_TYPE.FRY]: fry,
         [STEP_TYPE.CHOP]: chop,
         [STEP_TYPE.MIX]: mix,
         [STEP_TYPE.ASSEMBLE]: prep

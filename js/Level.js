@@ -3,8 +3,8 @@ import Interactable, { BedroomDoor, HouseDoor } from './Interactable.js';
 import InGameClock from '/js/InGameClock.js';
 import PottedPlant from '/js/PottedPlant.js';
 import Teleporter from '/js/Teleporter.js';
-import Oven from "/js/Oven.js";
-import PrepStation from "/js/PrepStation.js";
+import Oven, { Fryer } from "/js/Oven.js";
+import PrepStation, { EmptyStation } from "/js/PrepStation.js";
 import ChoppingStation from "/js/ChoppingStation.js";
 import MixingStation from '/js/MixingStation.js';
 import Customer from '/js/Customer.js';
@@ -585,34 +585,46 @@ export default class LevelManager {
         //this.sceneEntities.push(new StationPlaceholder(this.engine, 25 * TILE_SIZE, 16*TILE_SIZE, TILE_SIZE,TILE_SIZE));
 
         // cooking station 1
-        const prepStation1 = new PrepStation(22 * TILE_SIZE, 16 * TILE_SIZE, TILE_SIZE, TILE_SIZE, stationManager.getStationById("1"), this.engine);
-        const oven1 = new Oven(23.5 * TILE_SIZE - .5 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, 64, 64, stationManager.getStationById("1"),this.engine);
-        const choppingStation1 = new ChoppingStation(25 * TILE_SIZE - .5 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, 64, 64, stationManager.getStationById("1"),this.engine);
-        const mixingStation1 = new MixingStation(26.5 * TILE_SIZE - .5 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, 64, 64, stationManager.getStationById("1"),this.engine);
+        const prepStation1 = new PrepStation(17.5 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, TILE_SIZE, TILE_SIZE, stationManager.getStationById("1"), this.engine);
+        this.sceneEntities.push(new EmptyStation(18.5 * TILE_SIZE, 16 * TILE_SIZE))
+        const fryStation1 = new Fryer(19.5 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, TILE_SIZE, TILE_SIZE, stationManager.getStationById("1"), this.engine);
+        this.sceneEntities.push(new EmptyStation(20.5 * TILE_SIZE, 16 * TILE_SIZE))
+        const oven1 = new Oven(22 * TILE_SIZE - .5 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, TILE_SIZE, TILE_SIZE, stationManager.getStationById("1"),this.engine);
+        this.sceneEntities.push(new EmptyStation(22.5 * TILE_SIZE, 16 * TILE_SIZE))
+        const choppingStation1 = new ChoppingStation(24 * TILE_SIZE - .5 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, TILE_SIZE, TILE_SIZE, stationManager.getStationById("1"),this.engine);
+        this.sceneEntities.push(new EmptyStation(24.5 * TILE_SIZE, 16 * TILE_SIZE))
+        const mixingStation1 = new MixingStation(25.5 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, TILE_SIZE, TILE_SIZE, stationManager.getStationById("1"),this.engine);
 
         // cooking station 2
-        const prepStation2 = new PrepStation(33 * TILE_SIZE, 16 * TILE_SIZE, TILE_SIZE, TILE_SIZE, stationManager.getStationById("2"), this.engine);
-        const oven2 = new Oven(34.5 * TILE_SIZE - .5 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, 64, 64, stationManager.getStationById("2"),this.engine);
-        const choppingStation2 = new ChoppingStation(36 * TILE_SIZE - .5 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, 64, 64, stationManager.getStationById("2"),this.engine);
-        const mixingStation2 = new MixingStation(37.5 * TILE_SIZE - .5 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, 64, 64, stationManager.getStationById("2"),this.engine);
+        const prepStation2 = new PrepStation(30 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, TILE_SIZE, TILE_SIZE, stationManager.getStationById("2"), this.engine);
+        this.sceneEntities.push(new EmptyStation(31 * TILE_SIZE, 16 * TILE_SIZE))
+        const fryStation2 = new Fryer(32 * TILE_SIZE, 16 * TILE_SIZE- .5 * TILE_SIZE, TILE_SIZE, TILE_SIZE, stationManager.getStationById("2"), this.engine);
+        this.sceneEntities.push(new EmptyStation(33 * TILE_SIZE, 16 * TILE_SIZE))
+        const oven2 = new Oven(34.5 * TILE_SIZE - .5 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, TILE_SIZE, TILE_SIZE, stationManager.getStationById("2"),this.engine);
+        this.sceneEntities.push(new EmptyStation(35 * TILE_SIZE, 16 * TILE_SIZE))
+        const choppingStation2 = new ChoppingStation(36.5 * TILE_SIZE - .5 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, TILE_SIZE, TILE_SIZE, stationManager.getStationById("2"),this.engine);
+        this.sceneEntities.push(new EmptyStation(37 * TILE_SIZE, 16 * TILE_SIZE))
+        const mixingStation2 = new MixingStation(38.5 * TILE_SIZE - .5 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, TILE_SIZE, TILE_SIZE, stationManager.getStationById("2"),this.engine);
         
-        const stationMap1 = createStationMap(prepStation1, oven1, choppingStation1, mixingStation1);
-        const stationMap2 = createStationMap(prepStation2, oven2, choppingStation2, mixingStation2);
+        const stationMap1 = createStationMap(prepStation1, oven1, choppingStation1, mixingStation1, fryStation1);
+        const stationMap2 = createStationMap(prepStation2, oven2, choppingStation2, mixingStation2, fryStation2);
         const indicator1 = new StationIndicator(stationManager.getStationById("1"), stationMap1, this.engine);
         const indicator2 = new StationIndicator(stationManager.getStationById("2"), stationMap2, this.engine);
         this.sceneEntities.push(prepStation1);
+        this.sceneEntities.push(fryStation1);
         this.sceneEntities.push(oven1);
         this.sceneEntities.push(choppingStation1);
         this.sceneEntities.push(mixingStation1);
         this.sceneEntities.push(indicator1);
 
         this.sceneEntities.push(prepStation2);
+        this.sceneEntities.push(fryStation2)
         this.sceneEntities.push(oven2);
         this.sceneEntities.push(choppingStation2);
         this.sceneEntities.push(mixingStation2);
         this.sceneEntities.push(indicator2);
 
-        this.sceneEntities.push(new BedroomDoor(30 * TILE_SIZE, 16*TILE_SIZE, this.engine));
+        this.sceneEntities.push(new BedroomDoor(28 * TILE_SIZE, 16*TILE_SIZE, this.engine));
         this.sceneEntities.push(new HouseDoor(this.engine, 42*TILE_SIZE, 16*TILE_SIZE, false));
 
         const engine = this.engine;

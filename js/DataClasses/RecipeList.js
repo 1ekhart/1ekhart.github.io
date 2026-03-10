@@ -103,7 +103,7 @@ const Croquettes = {
         { type: "ingredients"},
         { type: "chop", duration: 120},
         { type: "mix", duration: 60},
-        { type: "cook", duration: 120},
+        { type: "fry", duration: 120},
         { type: "assemble", duration: 60}
     ]
 }
@@ -124,7 +124,7 @@ const FriedPumpkin = {
     steps: [
         { type: "ingredients"},
         { type: "mix", duration: 60},
-        { type: "cook", duration: 120},
+        { type: "fry", duration: 120},
         { type: "assemble", duration: 60}
     ]
 }

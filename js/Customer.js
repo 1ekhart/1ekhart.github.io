@@ -36,7 +36,7 @@ export default class Customer extends EntityInteractable {
         this.orderTaken = false;
         this.orderCompleted = false;
         this.availableStation = null;
-        this.text = `Press E to take order: ${this.recipeName} with ${this.ingredientNames}`;
+        // this.text = `Press E to take order: ${this.recipeName} with ${this.ingredientNames}`;
         //this.interactionCooldown = interactionCooldown;
         console.log(this.text);
         this.interactionCooldown = INTERACTION_COOLDOWN;
@@ -84,7 +84,11 @@ export default class Customer extends EntityInteractable {
             }
             this.availableStation.assignOrder(this.order);
             this.orderTaken = true;
-            this.prompt.changeText(`Order taken! Bring: ${this.recipeName} with ${this.ingredientNames}`);
+            if (this.ingredientID) {
+                this.prompt.changeText(`Order taken! Bring: ${this.recipeName} with ${this.ingredientName}`);
+            } else {
+                this.prompt.changeText(`Order taken! Bring: ${this.recipeName}`);
+            }
             this.prompt.showText();
 
             this.timerDisplay.showText();
@@ -102,11 +106,13 @@ export default class Customer extends EntityInteractable {
             if (equippedItem == this.recipeItemID && playerInventory.slots[playerInventory.getEquippedSlot()].isDish) { // check if the idno matches then do an additional check if the ingredient is there
                 
                 const dishIngredients = playerInventory.slots[playerInventory.getEquippedSlot()].ingredients;
-                const orderIngredients = this.order.ingredients;
-                const match = orderIngredients.every(id => dishIngredients.includes(id));
-                if (!match) {
-                    this.engine.addUIEntity(new DialogueBox(this.engine, "This is the right dish but with the wrong ingredients!", false, false));
-                    return;
+                const orderIngredient = this.ingredientID;
+                if (this.ingredientID) {
+                    const match = dishIngredients.includes(orderIngredient);
+                    if (!match) {
+                        this.engine.addUIEntity(new DialogueBox(this.engine, "This is the right dish but with the wrong ingredients!", false, false));
+                        return;
+                }
                 }
                 /*
                 if (!playerInventory.slots[playerInventory.getEquippedSlot()].ingredients.includes(this.ingredientID)) {
