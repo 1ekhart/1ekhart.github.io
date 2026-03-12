@@ -26,6 +26,7 @@ import StationIndicator from '/js/StationIndicator.js';
 import { STEP_TYPE } from '/js/Constants/cookingStationStates.js';
 import { createStationMap } from '/js/StationIndicator.js';
 import Cursor from '/js/GeneralUtils/Cursor.js';
+import FlyingEnemy from '/js/FlyingEnemy.js';
 
 // size of a tile in screen pixels
 const TILE_SIZE = 32;
@@ -553,6 +554,8 @@ export default class LevelManager {
         this.sceneEntities.push(new Basan(this.engine, monsterTiles[monsterTile][0] * TILE_SIZE, monsterTiles[monsterTile][1] * TILE_SIZE));
         // this.sceneEntities.push(new Teleporter(this.engine, 16*TILE_SIZE, 16*TILE_SIZE, TILE_SIZE, TILE_SIZE, 1));
         this.sceneEntities.push(new HouseDoor(this.engine, 7*TILE_SIZE, 16*TILE_SIZE, true));
+
+        this.sceneEntities.push(new FlyingEnemy(this.engine, 25*TILE_SIZE, 12*TILE_SIZE))
 
         const engine = this.engine;
         this.sceneEntities.forEach(function (entity) {

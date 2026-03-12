@@ -1,6 +1,6 @@
 //Global Constants
 export const CONSTANTS = {
-    DEBUG: false,
+    DEBUG: true,
     SCALE: 2,
     BITWIDTH: 16,
     TILESIZE: 32,
