@@ -10,6 +10,8 @@ export default class Cursor {
         this.hoverTextFont = '8px monospace';
     }
 
+    update() {}
+
     showText(Text) {
         this.hoverTextShown = true;
         this.hoverText = Text;
