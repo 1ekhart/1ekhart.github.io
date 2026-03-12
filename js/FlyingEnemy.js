@@ -1,28 +1,24 @@
 /** @import GameEngine from "/js/GameEngine.js" */
 import WorldEntity from "/js/AbstractClasses/WorldEntity.js";
-import { CONSTANTS, secondsToTicks } from '/js/Util.js';
+import Item from "/js/Item.js";
+import Player from "/js/Player.js";
+import { CONSTANTS, secondsToTicks, decreaseToZero } from "/js/Util.js";
+const min = Math.min, max = Math.max;
 
 const MAX_HEALTH = 30;
 
 const EVADE_DISTANCE = Math.pow(CONSTANTS.TILESIZE * 3, 2) // 3 tiles radius
-const ACTIVE_DISTANCE = Math.pow(CONSTANTS.TILESIZE * 10, 2) // 10 tiles radius
+const ACTIVE_DISTANCE = Math.pow(CONSTANTS.TILESIZE * 11, 2) // 11 tiles radius
+
+// the relative Y range to target the player at
+const TARGET_MIN_Y = 70;
+const TARGET_MAX_Y = 85;
+const TARGET_MIN_X = -80;
+const TARGET_MAX_X = 80 + 24; // player width
 
 const REGEN_COOLDOWN_DELAY = secondsToTicks(8); // 8 seconds before regen starts
 const REGEN_COOLDOWN_REGENERATING = secondsToTicks(0.5); // 0.5 seconds between HP increase
 const INVINCIBILITY_PERIOD = secondsToTicks(0.6);
-
-/** moves `num` towards zero by `delta` without overshooting zero.
- * @param {number} value the value to change
- * @param {number} delta the distance to move the value
- * @returns the modified value, or 0 if it was less than delta away from zero
- */
-export function decreaseToZero(value, delta) {
-    if (value > 0) {
-        return Math.max(value - delta, 0);
-    } else {
-        return Math.min(value + delta, 0);
-    }
-}
 
 export default class FlyingEnemy extends WorldEntity {
     /** @param {GameEngine} engine */
@@ -41,7 +37,9 @@ export default class FlyingEnemy extends WorldEntity {
         // swooping: flying at the player
         // cooldown: after swooping at the player
         this.state = "idle"; // idle, evading, active, swooping, cooldown
-        this.stateTicks = 0; // time until state change
+        this.stateTicks = 0; // counts up until state change
+
+        this.facingRight = true; // false = left, true = right
     }
 
     changeState(state) {
@@ -59,7 +57,8 @@ export default class FlyingEnemy extends WorldEntity {
             const squaredDistFromPlayer = Math.pow(this.x - player.x, 2) + Math.pow(this.y - player.y, 2);
             if(squaredDistFromPlayer < EVADE_DISTANCE) {
                 this.changeState("evading");
-                this.xVelocity = this.x > player.x ? 24 : -24; // move away from the player
+                this.facingRight = this.x > player.x // face away from the player
+                this.xVelocity = this.facingRight ? 24 : -24; // move away from the player
             }
             if(squaredDistFromPlayer > ACTIVE_DISTANCE) {
                 this.changeState("idle")
@@ -75,10 +74,35 @@ export default class FlyingEnemy extends WorldEntity {
                 this.changeState("active");
             }
         }
-        // active: wait for 2 secs, then swoop at the player
+        // active: wait for 2 secs & align w/ player height, then swoop at the player
         if(this.state === "active") {
+            // hover above the player's head level
+            const dy = player.y - this.y // positive if we're above the player
+            if(dy > TARGET_MAX_Y) { // too high above
+                this.yVelocity = min(this.yVelocity + 0.5, 6);
+            } else if(dy < TARGET_MIN_Y) { // too far below
+                this.yVelocity = max(this.yVelocity - 0.25, -3);
+            } else { // close enough
+                this.yVelocity = decreaseToZero(this.yVelocity, 2);
+            }
+
+            // face towards the player
+            this.facingRight = this.x < player.x
+
+            // hover close-ish to the player
+            const dx = player.x - this.x // positive if we're to the right of the player
+            if(dx > TARGET_MAX_X) {
+                this.xVelocity = min(this.xVelocity + 0.325, 3);
+            } else if(dx < TARGET_MIN_X) {
+                this.xVelocity = max(this.xVelocity - 0.325, -3);
+            } else {
+                this.xVelocity = decreaseToZero(this.xVelocity, 1);
+            }
+
             this.stateTicks += 1;
-            if(this.stateTicks > 120) {
+            // swoop after 2 seconds and we're aligned w/ the player vertically
+            if(this.stateTicks > 120 && this.yVelocity === 0) {
+                this.xVelocity = this.facingRight ? 3 : -3;
                 this.changeState("swooping")
             }
         }
@@ -86,10 +110,8 @@ export default class FlyingEnemy extends WorldEntity {
         if(this.state === "swooping") {
             if(this.stateTicks < 20) {
                 this.yVelocity += 0.25;
-                this.xVelocity += 0.25;
             } else {
-                this.yVelocity -= 0.75;
-                this.xVelocity -= 0.25;
+                this.yVelocity += -0.75;
             }
 
             this.stateTicks += 1;
@@ -109,6 +131,17 @@ export default class FlyingEnemy extends WorldEntity {
 
         this.moveColliding(this.engine)
 
+        // TODO: if collided w/ wall & evading, fly up and reverse direction to escape?
+        // maybe not necessary, it already flies erratically up & down
+
+        // deal contact damage
+        for(const entity of engine.entities[4]) {
+            if (entity instanceof Player && this.isCollidingWith(entity)) {
+                entity.reduceHealth(20);
+            }
+        }
+
+        // regenerate health
         if(this.health < MAX_HEALTH) {
             if(this.regenTimer <= 0) {
                 this.health += 1;
@@ -119,7 +152,6 @@ export default class FlyingEnemy extends WorldEntity {
         this.invincibilityTicks -= 1;
     }
 
-    /** @param {Player} player */
     onAttack() {
         if (this.invincibilityTicks > 0) {return;}
         this.invincibilityTicks = INVINCIBILITY_PERIOD;
@@ -132,7 +164,7 @@ export default class FlyingEnemy extends WorldEntity {
                 8, // TODO: different item
                 this.x + 20, this.y,
                 0, -4,
-                4
+                6 // 6 of it, it's hard to get
             ))
         }
     }
@@ -143,11 +175,11 @@ export default class FlyingEnemy extends WorldEntity {
      * @param {number} deltaTime
      */
     draw(ctx, engine, deltaTime) {
-        ctx.fillStyle = "#ffaa00";
+        ctx.fillStyle = this.facingRight ? "#ffcc00" : "#ff8800";
         ctx.fillRect(this.x - engine.camera.x, this.y - engine.camera.y, this.width, this.height);
-        ctx.fillText(`HP: ${this.health}/${MAX_HEALTH}`, this.x - engine.camera.x, this.y - 14 - engine.camera.y);
 
         if(CONSTANTS.DEBUG) {
+            ctx.fillText(`HP: ${this.health}/${MAX_HEALTH}`, this.x - engine.camera.x, this.y - 14 - engine.camera.y);
             ctx.fillText(this.state, this.x - engine.camera.x, this.y - 32 - engine.camera.y);
         }
     }

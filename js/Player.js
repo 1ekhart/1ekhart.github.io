@@ -5,6 +5,7 @@ import DialogueBox from "/js/GeneralUtils/DialogueBox.js";
 import HitBox from "./GeneralUtils/BoundingBox.js";
 import Inventory from "/js/Inventory.js";
 import MovingEntity from "/js/MovingEntity.js";
+import FlyingEnemy from "/js/FlyingEnemy.js";
 import { CONSTANTS, decreaseToZero, secondsToTicks } from "/js/Util.js";
 import Customer from "/js/Customer.js";
 
@@ -28,7 +29,6 @@ export default class Player extends WorldEntity {
         this.width = 24;
         this.height = 48;
 
-        // mapping from item name to # of that item the player has
         this.inventory = new Inventory();
         this.health = MAX_HEALTH;
         this.maxHealth = MAX_HEALTH;
@@ -165,9 +165,6 @@ export default class Player extends WorldEntity {
             }
             engine.addEntity(this.attack);
         }
-        // if (this.inventory.getEquippedSlot != null) {
-        //     this.displayPlayerWarning("Cannot attack while holding an item, please deselect!");
-        // }
     }
 
     reduceHealth(amt) {
@@ -179,8 +176,6 @@ export default class Player extends WorldEntity {
     /** @param {GameEngine} engine */
     move(engine) {
         // movement
-        // TODO: adjust acceleration & drag to 'feel' better, these are placeholder values
-
         if (this.haltMovement == false) {
             if (engine.input.left && this.xVelocity > -WALKING_SPEED) {
                 this.xVelocity -= ACCELERATION;
@@ -212,9 +207,6 @@ export default class Player extends WorldEntity {
         }
 
         if (this.haltMovement == false) {
-            // if (engine.input.click && this.inventory.getEquippedSlot() === null) {
-            //     this.tryAttack();
-            //} 
             if (engine.input.left) {
                 if (this.onGround) this.setAnimationState("Run");
                 this.isRight = false;
@@ -318,7 +310,7 @@ export default class Player extends WorldEntity {
         this.warningText = Text;
         this.warningTimer = WARNING_DURATION;
         // console.log("Warning Timer: " + this.warningTimer + ", Text: " + this.warningText)
-        
+
         let words = Text.split(' ');
         let line = '';
         let lines = [];
@@ -363,9 +355,8 @@ class BladeHitbox extends HitBox {
         }
 
         for(const entity of engine.entities[3]) {
-            if (entity instanceof MovingEntity && this.isCollidingWith(entity)) {
+            if ((entity instanceof MovingEntity || entity instanceof FlyingEnemy) && this.isCollidingWith(entity)) {
                 entity.onAttack();
-                console.log("attack!")
             }
         }
     }
