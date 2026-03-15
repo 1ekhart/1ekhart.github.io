@@ -94,6 +94,38 @@ const validTiles = [
     [48, 16]
 ]
 
+const tree10Tiles = [
+    [28, 14],
+    [31, 14],
+    [45, 14],
+    [67, 14],
+    [80, 14],
+    [87, 14],
+    [70, 0]
+]
+
+const tree11Tiles = [
+    [34, 14],
+    [83, 14],
+    [94, 14],
+    [72, 1]
+]
+
+const tree12TilesOut = [
+    [10, 14],
+    [37, 14],
+    [49, 14],
+    [55, 14],
+    [78, 14],
+    [89, 14],
+    [92, 14],
+    [67, 1]
+]
+
+const tree12TilesIn = [
+    [45, 14]
+]
+
 const monsterTiles = [
     [80, 1],
     [80, 10],
@@ -525,6 +557,18 @@ export default class LevelManager {
             this.sceneEntities.push(new Item(wildItems[2], validTiles[destTile][0] * TILE_SIZE + TILE_SIZE / 4, validTiles[destTile][1] * TILE_SIZE, 0, -4, Math.ceil(Math.random() * 3)));
             occupiedTiles.push(destTile);
         }
+
+        for(let i = 0; i < tree10Tiles.length; i++){
+            this.sceneEntities.push(new BedroomDoor(tree10Tiles[i][0] * TILE_SIZE, tree10Tiles[i][1]*TILE_SIZE, this.engine));
+        }
+
+        for(let i = 0; i < tree11Tiles.length; i++){
+            this.sceneEntities.push(new BedroomDoor(tree11Tiles[i][0] * TILE_SIZE, tree11Tiles[i][1]*TILE_SIZE, this.engine));
+        }
+
+        for(let i = 0; i < tree12TilesOut.length; i++){
+            this.sceneEntities.push(new BedroomDoor(tree12TilesOut[i][0] * TILE_SIZE, tree12TilesOut[i][1]*TILE_SIZE, this.engine));
+        }
         // get the save data and iterate through the entities, which are just pots for now.
         const save = getSave();
         const saveEntities = save.entities;
@@ -629,6 +673,10 @@ export default class LevelManager {
 
         this.sceneEntities.push(new BedroomDoor(28 * TILE_SIZE, 16*TILE_SIZE, this.engine));
         this.sceneEntities.push(new HouseDoor(this.engine, 42*TILE_SIZE, 16*TILE_SIZE, false));
+
+        for(let i = 0; i < tree12TilesIn.length; i++){
+            this.sceneEntities.push(new BedroomDoor(tree12TilesIn[i][0] * TILE_SIZE, tree12TilesIn[i][1]*TILE_SIZE, this.engine));
+        }
 
         const engine = this.engine;
         this.sceneEntities.forEach(function (entity) {
