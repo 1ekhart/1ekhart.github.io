@@ -129,11 +129,87 @@ const FriedPumpkin = {
     ]
 }
 
+const Cake = {
+    recipeID: 5,
+    itemID: 16,
+    ingredients: {
+        1: {
+            hasSpecificIngredient: true,
+            eligibleIngredients: [15]
+        },
+        2: {
+            hasSpecificIngredient: true,
+            eligibleIngredients: [7]
+        },
+        3: {
+            hasSpecificIngredient: true,
+            eligibleIngredients: [14]
+        }
+    },
+    steps: [
+        {type: "ingredients"},
+        { type: "chop", duration: 60},
+        { type: "mix", duration: 60},
+        { type: "cook", duration: 60},
+        { type: "assemble", duration: 60}
+    ]
+}
+
+const Pie = {
+    recipeID: 6,
+    itemID: 17,
+    ingredients: {
+        1: {
+            hasSpecificIngredient: true,
+            eligibleIngredients: [15]
+        },
+        2: {
+            hasSpecificIngredient: true,
+            eligibleIngredients: [7]
+        },
+        3: {
+            hasSpecificIngredient: true,
+            eligibleIngredients: [14]
+        }
+    },
+    steps: [
+        {type: "ingredients"},
+        { type: "chop", duration: 60},
+        { type: "mix", duration: 60},
+        { type: "cook", duration: 60},
+        { type: "assemble", duration: 60}
+    ]
+}
+
+const OnionRing = {
+    recipeID: 7,
+    itemID: 20,
+    ingredients: {
+        1: {
+            hasSpecificIngredient: true,
+            eligibleIngredients: [19]
+        },
+        2: {
+            hasSpecificIngredient: true,
+            eligibleIngredients: [7]
+        }
+    },
+    steps: [
+        { type: "ingredients"},
+        { type: "mix", duration: 60},
+        { type: "fry", duration: 120},
+        { type: "assemble", duration: 60}
+    ]
+}
+
 export const recipeList = {
     1: RiceBowl,
     2: Burger,
     3: Croquettes,
-    4: FriedPumpkin
+    4: FriedPumpkin,
+    5: Cake,
+    6: Pie,
+    7: OnionRing
 }
 
 export const getRecipeData = (recipeID) => {

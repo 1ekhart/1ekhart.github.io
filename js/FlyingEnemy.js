@@ -203,7 +203,7 @@ export default class FlyingEnemy extends WorldEntity {
         if(this.health <= 0) {
             this.remove()
             this.engine.addEntity(new Item(
-                8, // TODO: different item
+                18, // TODO: different item
                 this.x + 20, this.y,
                 0, -4,
                 6 // 6 of it, it's hard to get

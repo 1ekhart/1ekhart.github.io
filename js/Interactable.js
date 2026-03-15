@@ -6,6 +6,7 @@ import Item from '/js/Item.js';
 import { randomIntRange, CONSTANTS } from '/js/Util.js';
 import Animator from '/js/GeneralUtils/Animator.js';
 import MarketPlaceUI from '/js/MarketplaceUI.js';
+import Entity from '/js/AbstractClasses/Entity.js';
 
 export default class Interactable extends EntityInteractable {
     constructor(x, y, width, height, engine) {
@@ -228,4 +229,99 @@ export class HouseDoor extends EntityInteractable {
                 ctx.strokeRect(Math.floor(this.x - engine.camera.x), Math.floor(this.y - engine.camera.y), this.width, this.height);
             }
         }
+}
+
+export class StrawberryBush extends EntityInteractable {
+    constructor(engine, x, y, hasBerries) {
+            super();
+            const height = 32;
+            const width = 32;
+            this.engine = engine;
+            this.width = width * 2;
+            this.height = height * 2;
+            this.x = x - (width / 2);
+            this.y = y - (height / 2);
+            this.hasBerries = hasBerries;
+    
+            this.renderX = x;
+            this.renderY = y - (height / 2);
+            if (hasBerries) {
+                this.prompt = new OnScreenTextSystem(this,
+                        x + (width / 4), y - (height / 4) - 8, `Harvest Berries`, false);
+                engine.addUIEntity(this.prompt);
+            } 
+            
+            this.sprite = new Animator(ASSET_MANAGER.getAsset("/Assets/WorldItems/StrawberryBush-Sheet.png"), 0, 0, 32, 32, 2, 1, 0, false, false);
+        }
+    
+        update(engine) {
+            if (!engine.entities[4]) return;
+            if (this.hasBerries !== true) return;
+            for (const entity of engine.entities[4]) {
+                if (entity instanceof Player) {
+                    if (this.isCollidingWith(entity)) {
+                        this.prompt.showText();
+                    } else {
+                        this.prompt.hideText();
+                    }
+                }
+            }
+        }
+    
+        
+    
+         /** @param {Player} player */
+        interact(player) {
+            if (this.hasBerries == false) {return;}
+            this.prompt.hideText();
+            this.prompt.removeFromWorld = true;
+            this.engine.addEntity(new Item(15, this.x + (this.width / 4), this.y - (this.height / 2), randomIntRange(10, -10), -5, randomIntRange(5, 1)))
+            this.hasBerries = false;
+        }
+        
+        draw(ctx, engine) {
+            this.sprite.drawFramePlain(ctx, this.renderX - engine.camera.x - 16, this.renderY - engine.camera.y - 10, 2, this.hasBerries ? 1 : 0);
+            if (CONSTANTS.DEBUG == true) {
+                ctx.strokeStyle = "#aa0000";
+                ctx.strokeRect(Math.floor(this.x - engine.camera.x), Math.floor(this.y - engine.camera.y), this.width, this.height);
+            }
+        }
+}
+
+
+export class Tree extends Entity {
+    constructor(x, y, treeType, isForeground) {
+        super();
+        this.x = x;
+        this.y = y; 
+        if (treeType = 1) {
+            if (isForeground) {
+                this.sprite = new Animator(ASSET_MANAGER.getAsset("/Assets/WorldItems/Tree-Sheet.png"), 64, 0, 32, 48, 1, 1, 0, false, false);
+            } else {
+                this.sprite = new Animator(ASSET_MANAGER.getAsset("/Assets/WorldItems/Tree-Sheet.png"), 0, 0, 32, 48, 1, 1, 0, false, false);
+            }
+        }
+        if (treeType = 2) {
+            if (isForeground) {
+                this.sprite = new Animator(ASSET_MANAGER.getAsset("/Assets/WorldItems/Tree-Sheet.png"), 96, 0, 32, 48, 1, 1, 0, false, false);
+            } else {
+                this.sprite = new Animator(ASSET_MANAGER.getAsset("/Assets/WorldItems/Tree-Sheet.png"), 32, 0, 32, 48, 1, 1, 0, false, false);
+            }
+        }
+        if (treeType = 3) {
+            if (isForeground) {
+                this.sprite = new Animator(ASSET_MANAGER.getAsset("/Assets/WorldItems/Tree-Sheet.png"), 160, 0, 32, 48, 1, 1, 0, false, false);
+            } else {
+                this.sprite = new Animator(ASSET_MANAGER.getAsset("/Assets/WorldItems/Tree-Sheet.png"), 128, 0, 32, 48, 1, 1, 0, false, false);
+            }
+        }
+        if (treeType < 1 || treeType > 4) {
+            this.sprite = new Animator(ASSET_MANAGER.getAsset("/Assets/WorldItems/Tree-Sheet.png"), 48, 0, 32, 48, 1, 1, 0, false, false);
+        }
+        this.sprite = new Animator(ASSET_MANAGER.getAsset("/Assets/WorldItems/Tree-Sheet.png"), 48, 0, 32, 48, 1, 1, 0, false, false);
+    }
+
+    draw(ctx, engine) {
+        this.sprite.drawFramePlain(ctx, this.x - engine.camera.x, this.y - engine.camera.y - 32, 2);
+    }
 }

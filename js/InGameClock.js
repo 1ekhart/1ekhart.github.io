@@ -7,7 +7,7 @@ import LevelManager from "/js/Level.js";
 import { CONSTANTS, secondsToTicks } from "/js/Util.js";
 
 // how many ticks each day will last. Each day is 24 hours, so the hour length will be DAY_LENGTH / 24 and minutes  will be HOUR_LENGTH / 60
-const DAY_LENGTH = secondsToTicks(180); // 200 day length means each minute will be rough 0.14 seconds
+const DAY_LENGTH = secondsToTicks(240); // 200 day length means each minute will be rough 0.14 seconds
 const HOUR_LENGTH = DAY_LENGTH / 24;
 const MINUTE_LENGTH = HOUR_LENGTH / 60;
 

@@ -1,5 +1,5 @@
 /** @import GameEngine from "/js/GameEngine.js" */
-import Interactable, { BedroomDoor, HouseDoor } from './Interactable.js';
+import Interactable, { BedroomDoor, HouseDoor, StrawberryBush } from './Interactable.js';
 import InGameClock from '/js/InGameClock.js';
 import PottedPlant from '/js/PottedPlant.js';
 import Teleporter from '/js/Teleporter.js';
@@ -9,7 +9,7 @@ import ChoppingStation from "/js/ChoppingStation.js";
 import MixingStation from '/js/MixingStation.js';
 import Customer from '/js/Customer.js';
 import { RECIPES } from '/js/Data/Recipes.js';
-import { CONSTANTS, secondsToTicks } from '/js/Util.js';
+import { CONSTANTS, randomIntRange, secondsToTicks } from '/js/Util.js';
 import Button from '/js/AbstractClasses/Button.js';
 import InventoryUI from '/js/InventoryUI.js';
 import DialogueBox from '/js/GeneralUtils/DialogueBox.js';
@@ -94,6 +94,16 @@ const validTiles = [
     [46, 20]
 ]
 
+const bushTiles = [
+    [84, 16],
+    [70, 16],
+    [59, 16],
+    [55, 16],
+    [58, 4],
+    [81, 2],
+    [50, 16]
+]
+
 const monsterTiles = [
     [80, 33],
     [80, 1],
@@ -105,6 +115,7 @@ const monsterTiles = [
 const wildItems = [
     3, //Potato
     4, //Rice
+    19, //Onion
     6, //Cabbage
     8, //Boar Meat
     8, //Boat Meat (this is just for math.random shenanigans)
@@ -515,6 +526,18 @@ export default class LevelManager {
         this.sceneEntities = [];
         this.data = level_data_outside;
         const occupiedTiles = [];
+
+        for (let j = 0; j < bushTiles.length; j++) {
+            let amountOfValidBushes = 0;
+            let randomInteger = randomIntRange(0, 10);
+            if (randomInteger % 2 && amountOfValidBushes < 3) {
+                this.sceneEntities.push(new StrawberryBush(this.engine, bushTiles[j][0] * TILE_SIZE, bushTiles[j][1] * TILE_SIZE, true));
+                amountOfValidBushes++;
+            } else {
+                this.sceneEntities.push(new StrawberryBush(this.engine, bushTiles[j][0] * TILE_SIZE, bushTiles[j][1] * TILE_SIZE, false));
+            }
+            occupiedTiles.push(j);
+        } 
         for(let i = 0; i < 3; i++) {
             var validSelection = 0;
             while (validSelection == 0) {
@@ -523,8 +546,8 @@ export default class LevelManager {
                     validSelection = 1;
                 }
             }
-            this.sceneEntities.push(new Item(wildItems[2], validTiles[destTile][0] * TILE_SIZE + TILE_SIZE / 4, validTiles[destTile][1] * TILE_SIZE, 0, -4, Math.ceil(Math.random() * 3)));
-            occupiedTiles.push(destTile);
+            this.sceneEntities.push(new Item(wildItems[randomIntRange(2, 4)], validTiles[destTile][0] * TILE_SIZE + TILE_SIZE / 4, validTiles[destTile][1] * TILE_SIZE, 0, -4, Math.ceil(Math.random() * 3)));
+            occupiedTiles.push(destTile); 
         }
         // get the save data and iterate through the entities, which are just pots for now.
         const save = getSave();
