@@ -34,6 +34,8 @@ ASSET_MANAGER.queueDownload("/Assets/WorldItems/PotatoPlant-Sheet.png")
 ASSET_MANAGER.queueDownload("/Assets/WorldItems/PumpkinPlant-Sheet.png")
 ASSET_MANAGER.queueDownload("/Assets/WorldItems/CabbagePlant-Sheet.png")
 ASSET_MANAGER.queueDownload("/Assets/WorldItems/RicePlant-Sheet.png")
+ASSET_MANAGER.queueDownload("/Assets/WorldItems/SugarPlant-Sheet.png")
+ASSET_MANAGER.queueDownload("/Assets/WorldItems/Tree-Sheet.png")
 
 //download from world tiles folder
 ASSET_MANAGER.queueDownload("/Assets/WorldTiles/Wood_(placed).webp")
@@ -64,6 +66,7 @@ ASSET_MANAGER.queueDownload("/Assets/Icons/CompleteOrder.png")
 ASSET_MANAGER.queueDownload("/Assets/Icons/Croquettes.png")
 ASSET_MANAGER.queueDownload("/Assets/Icons/FriedPumpkin.png")
 ASSET_MANAGER.queueDownload("/Assets/Icons/PumpkinIcon.png")
+ASSET_MANAGER.queueDownload("/Assets/Icons/SugarCaneIcon.png")
 
 
 
