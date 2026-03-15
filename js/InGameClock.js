@@ -196,7 +196,7 @@ export default class InGameClock extends Entity {
 
         ctx.font = "12px monospace";
         if (CONSTANTS.DEBUG) {
-            ctx.fillText(`dayTimeTicks: ${this.this.dayTimeTicks}`, 200, 10);
+            ctx.fillText(`dayTimeTicks: ${this.dayTimeTicks}`, 200, 10);
         }
     }
 }

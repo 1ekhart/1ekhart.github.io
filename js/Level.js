@@ -26,6 +26,7 @@ import StationIndicator from '/js/StationIndicator.js';
 import { STEP_TYPE } from '/js/Constants/cookingStationStates.js';
 import { createStationMap } from '/js/StationIndicator.js';
 import Cursor from '/js/GeneralUtils/Cursor.js';
+import FlyingEnemy from '/js/FlyingEnemy.js';
 
 // size of a tile in screen pixels
 const TILE_SIZE = 32;
@@ -555,6 +556,8 @@ export default class LevelManager {
         // this.sceneEntities.push(new Teleporter(this.engine, 16*TILE_SIZE, 16*TILE_SIZE, TILE_SIZE, TILE_SIZE, 1));
         this.sceneEntities.push(new HouseDoor(this.engine, 7*TILE_SIZE, 16*TILE_SIZE, true));
 
+        this.sceneEntities.push(new FlyingEnemy(this.engine, 86*TILE_SIZE, 30*TILE_SIZE))
+
         const engine = this.engine;
         this.sceneEntities.forEach(function (entity) {
             engine.addEntity(entity, INTERACTABLE_OBJECT_LAYER);
@@ -606,7 +609,7 @@ export default class LevelManager {
         const choppingStation2 = new ChoppingStation(36.5 * TILE_SIZE - .5 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, TILE_SIZE, TILE_SIZE, stationManager.getStationById("2"),this.engine);
         this.sceneEntities.push(new EmptyStation(37 * TILE_SIZE, 16 * TILE_SIZE))
         const mixingStation2 = new MixingStation(38.5 * TILE_SIZE - .5 * TILE_SIZE, 16 * TILE_SIZE - .5 * TILE_SIZE, TILE_SIZE, TILE_SIZE, stationManager.getStationById("2"),this.engine);
-        
+
         const stationMap1 = createStationMap(prepStation1, oven1, choppingStation1, mixingStation1, fryStation1);
         const stationMap2 = createStationMap(prepStation2, oven2, choppingStation2, mixingStation2, fryStation2);
         const indicator1 = new StationIndicator(stationManager.getStationById("1"), stationMap1, this.engine);
