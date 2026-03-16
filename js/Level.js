@@ -1,5 +1,5 @@
 /** @import GameEngine from "/js/GameEngine.js" */
-import Interactable, { BedroomDoor, HouseDoor } from './Interactable.js';
+import Interactable, { BedroomDoor, HouseDoor, StrawberryBush, Tree } from './Interactable.js';
 import InGameClock from '/js/InGameClock.js';
 import PottedPlant from '/js/PottedPlant.js';
 import Teleporter from '/js/Teleporter.js';
@@ -8,8 +8,7 @@ import PrepStation, { EmptyStation } from "/js/PrepStation.js";
 import ChoppingStation from "/js/ChoppingStation.js";
 import MixingStation from '/js/MixingStation.js';
 import Customer from '/js/Customer.js';
-import { RECIPES } from '/js/Data/Recipes.js';
-import { CONSTANTS, secondsToTicks } from '/js/Util.js';
+import { CONSTANTS, randomIntRange, secondsToTicks } from '/js/Util.js';
 import Button from '/js/AbstractClasses/Button.js';
 import InventoryUI from '/js/InventoryUI.js';
 import DialogueBox from '/js/GeneralUtils/DialogueBox.js';
@@ -27,6 +26,7 @@ import { STEP_TYPE } from '/js/Constants/cookingStationStates.js';
 import { createStationMap } from '/js/StationIndicator.js';
 import Cursor from '/js/GeneralUtils/Cursor.js';
 import FlyingEnemy from '/js/FlyingEnemy.js';
+import TransitionScreen from '/js/TransitionScreen.js';
 
 // size of a tile in screen pixels
 const TILE_SIZE = 32;
@@ -54,6 +54,7 @@ const tileTextures = [
     "/Assets/WorldTiles/StoneSheet.png",
     "/Assets/WorldTiles/BWoodSheet.png",
     "/Assets/WorldTiles/GrassSheet.png",
+    "/Assets/WorldItems/Tree-Sheet.png",
     "nothing"
 ];
 
@@ -65,12 +66,12 @@ const BACKGROUND_ASSET_NIGHT = "/Assets/WorldTiles/NightBG.png"
 const BACKGROUND_TIME_MORNING = secondsToTicks(82.5);
 const BACKGROUND_TIME_AFTERNOON = secondsToTicks(135);
 const BACKGROUND_TIME_SUNSET = secondsToTicks(150);
-
+//24 tiles 0-8 are underground. 
 const validTiles = [
     [80, 34],
     [86, 34],
-    [80, 26],
-    [83, 26],
+    [82, 26],
+    [84, 26],
     [80, 20],
     [75, 20],
     [70, 25],
@@ -90,11 +91,55 @@ const validTiles = [
     [45, 5],
     [44, 5],
     [46, 16],
-    [46, 20]
+    [48, 16]
+]
+
+const tree10Tiles = [
+    [27, 14],
+    [31, 14],
+    [45, 14],
+    [67, 14],
+    [80, 14],
+    [87, 14],
+    [69, 0]
+]
+
+const tree11Tiles = [
+    [34, 14],
+    [83, 14],
+    [94, 14],
+    [71, 1],
+    [29, 14],
+    [51, 14]
+]
+
+const tree12TilesOut = [
+    [10, 14],
+    [36, 14],
+    [38, 14],
+    [49, 14],
+    [55, 14],
+    [78, 14],
+    [89, 14],
+    [92, 14],
+    [66, 1]
+]
+
+const tree12TilesIn = [
+    [45, 14]
+]
+
+const bushTiles = [
+    [84, 16],
+    [70, 16],
+    [59, 16],
+    [55, 16],
+    [58, 4],
+    [81, 2],
+    [50, 16]
 ]
 
 const monsterTiles = [
-    [80, 33],
     [80, 1],
     [80, 10],
     [46, 4],
@@ -104,6 +149,7 @@ const monsterTiles = [
 const wildItems = [
     3, //Potato
     4, //Rice
+    19, //Onion
     6, //Cabbage
     8, //Boar Meat
     8, //Boat Meat (this is just for math.random shenanigans)
@@ -211,7 +257,8 @@ export default class LevelManager {
             { x: 2 * TILE_SIZE, y: 15 * TILE_SIZE },
             { x: 6 * TILE_SIZE, y: 15 * TILE_SIZE }
         ];
-
+        this.BackgroundManager = new BackgroundManager(engine);
+            this.engine.addEntity(this.BackgroundManager, 1)
         this.customerManager = new CustomerManager(this.engine, this.customerSpots);
     }
 
@@ -243,7 +290,7 @@ export default class LevelManager {
             // that.engine.inventoryUI = inventoryUI;
             that.engine.addUIEntity(inventoryUI);
             // COMMENT OUT THE REST OF THE LEVELS EXCEPT WHAT YOU WANT TO TELEPORT TO AT THE START
-            that.teleport(3, 30, 15.5);
+            that.teleport(3, 28, 15.5);
             // that.teleport(1, 2, 2);
 
             if (that.engine.getClock().dayCount <= 1) {
@@ -355,10 +402,11 @@ export default class LevelManager {
                 const entityLine = entitylist;
                 if (entityLine) {
                     entityLine.forEach(function (entity) {
-                        if (!entity instanceof Player ||!entity instanceof LevelManager || !entity instanceof Cursor) {
+                        if (!entity instanceof Player ||!entity instanceof LevelManager || !entity instanceof Cursor || !entity instanceof BackgroundManager) {
                             entity.removeFromWorld = true;
                         } else if (entity instanceof InGameClock) {entity.removeFromWorld = true;}
                         else if (entity instanceof InventoryUI) {entity.removeFromWorld = true;}
+                        else if (entity instanceof Tree) {entity.removeFromWorld = true;}
                     })
                 }
             });
@@ -402,7 +450,7 @@ export default class LevelManager {
         const fastForward = () => {
             that.discardMenuUI();
             that.engine.getClock().skipToNextDay();
-            that.engine.getClock().resumeTime();
+            //that.engine.getClock().resumeTime();
         }
         this.menuButtons = [];
         this.menuButtons.push(new DialogueBox(this.engine, "Sleep to the next day? (saves the game)", true));
@@ -430,15 +478,16 @@ export default class LevelManager {
         }
         const goInside = () => {
             that.discardMenuUI();
+            door.displaying = false;
             if (!that.engine.getClock().isCookingMode) {
-                that.engine.getClock().resumeTime();
+                //that.engine.getClock().resumeTime();
                 that.engine.getClock().skipToCookingMode();
             } else {
-                console.log("attempted to go inside when already cooking mode")
-                that.engine.getClock().resumeTime();
-                that.teleport(3, 40, 15.5);
+                //console.log("attempted to go inside when already cooking mode")
+                const transition = new TransitionScreen(that.engine, () => { hat.teleport(3, 40, 15.5); });
+                //that.engine.getClock().resumeTime();
+                that.engine.addUIEntity(transition);
             }
-            door.displaying = false;
         }
         const openMarket = () => {
             that.discardMenuUI();
@@ -514,6 +563,18 @@ export default class LevelManager {
         this.sceneEntities = [];
         this.data = level_data_outside;
         const occupiedTiles = [];
+
+        for (let j = 0; j < bushTiles.length; j++) {
+            let amountOfValidBushes = 0;
+            let randomInteger = randomIntRange(0, 10);
+            if (randomInteger % 2 && amountOfValidBushes < 3) {
+                this.sceneEntities.push(new StrawberryBush(this.engine, bushTiles[j][0] * TILE_SIZE, bushTiles[j][1] * TILE_SIZE, true));
+                amountOfValidBushes++;
+            } else {
+                this.sceneEntities.push(new StrawberryBush(this.engine, bushTiles[j][0] * TILE_SIZE, bushTiles[j][1] * TILE_SIZE, false));
+            }
+            occupiedTiles.push(j);
+        } 
         for(let i = 0; i < 3; i++) {
             var validSelection = 0;
             while (validSelection == 0) {
@@ -522,9 +583,10 @@ export default class LevelManager {
                     validSelection = 1;
                 }
             }
-            this.sceneEntities.push(new Item(wildItems[2], validTiles[destTile][0] * TILE_SIZE + TILE_SIZE / 4, validTiles[destTile][1] * TILE_SIZE, 0, -4, Math.ceil(Math.random() * 3)));
-            occupiedTiles.push(destTile);
+            this.sceneEntities.push(new Item(wildItems[randomIntRange(2, 4)], validTiles[destTile][0] * TILE_SIZE + TILE_SIZE / 4, validTiles[destTile][1] * TILE_SIZE, 0, -4, Math.ceil(Math.random() * 3)));
+            occupiedTiles.push(destTile); 
         }
+
         // get the save data and iterate through the entities, which are just pots for now.
         const save = getSave();
         const saveEntities = save.entities;
@@ -550,7 +612,7 @@ export default class LevelManager {
         }
 
 
-        const monsterTile = Math.floor(Math.random() * 4);
+        const monsterTile = Math.floor(Math.random() * 3);
         this.sceneEntities.push(new Basan(this.engine, monsterTiles[monsterTile][0] * TILE_SIZE, monsterTiles[monsterTile][1] * TILE_SIZE));
         // this.sceneEntities.push(new Teleporter(this.engine, 16*TILE_SIZE, 16*TILE_SIZE, TILE_SIZE, TILE_SIZE, 1));
         this.sceneEntities.push(new HouseDoor(this.engine, 7*TILE_SIZE, 16*TILE_SIZE, true));
@@ -561,6 +623,25 @@ export default class LevelManager {
         this.sceneEntities.forEach(function (entity) {
             engine.addEntity(entity, INTERACTABLE_OBJECT_LAYER);
         })
+
+        // add the trees after the scene entities adding
+        for(let i = 0; i < tree10Tiles.length; i++){
+            const Trees = new Tree(tree10Tiles[i][0] * TILE_SIZE, tree10Tiles[i][1]*TILE_SIZE, 1)
+            this.engine.addEntity(Trees, 1)
+            this.sceneEntities.push(Trees)
+        }
+
+        for(let i = 0; i < tree11Tiles.length; i++){
+            const Trees = new Tree(tree11Tiles[i][0] * TILE_SIZE, tree11Tiles[i][1]*TILE_SIZE, 2)
+            this.engine.addEntity(Trees, 1)
+            this.sceneEntities.push(Trees)
+        }
+
+        for(let i = 0; i < tree12TilesOut.length; i++){
+            const Trees = new Tree(tree12TilesOut[i][0] * TILE_SIZE, tree12TilesOut[i][1]*TILE_SIZE, 3)
+            this.engine.addEntity(Trees, 1)
+            this.sceneEntities.push(Trees)
+        }
     }
 
     loadLevelInside() {
@@ -630,10 +711,20 @@ export default class LevelManager {
         this.sceneEntities.push(new BedroomDoor(28 * TILE_SIZE, 16*TILE_SIZE, this.engine));
         this.sceneEntities.push(new HouseDoor(this.engine, 42*TILE_SIZE, 16*TILE_SIZE, false));
 
+        // for(let i = 0; i < tree12TilesIn.length; i++){
+        //     this.sceneEntities.push(new Tree(tree12TilesIn[i][0] * TILE_SIZE, tree12TilesIn[i][1]*TILE_SIZE, 3));
+        // }
+
         const engine = this.engine;
         this.sceneEntities.forEach(function (entity) {
             engine.addEntity(entity, INTERACTABLE_OBJECT_LAYER);
         })
+
+        for(let i = 0; i < tree12TilesIn.length; i++){
+            const Trees = new Tree(tree12TilesIn[i][0] * TILE_SIZE, tree12TilesIn[i][1]*TILE_SIZE, 3)
+            this.engine.addEntity(Trees, 1)
+            this.sceneEntities.push(Trees);
+        }
 
         if (this.engine.getClock().isCookingMode && this.engine.getClock().dayCount <= 1) {
             this.engine.addUIEntity(new DialogueBox(this.engine, "Take orders from the customers before they walk out! Customers will ask for a dish with a specific ingredient, so go to a cooking station and make sure you use it while cooking. If you don't have the ingredients, press F to refuse their order, and someone else might take their spot!"));
@@ -695,7 +786,8 @@ export default class LevelManager {
         // check all tiles that the box overlaps
         for (let x = left; x <= right; x++) {
             for (let y = top; y <= bottom; y++) {
-                if (this.getTile(x, y) !== 0 && this.getTile(x,y) != 3 && this.getTile(x,y) != 6) {
+                let tileVal = this.getTile(x, y);
+                if (tileVal !== 0 && tileVal != 3 && tileVal != 6 && !(tileVal >= 10 && tileVal <= 12)) {
                     return true;
                 }
             }
@@ -743,41 +835,41 @@ export default class LevelManager {
             this.y = Math.max(worldCenterY + VERTICAL_FORGIVENESS, 0)
         }
 
+        // June note: We'll let background be a seperate entity
+        // // --- background ---
+        // const timeOfDay = engine.getClock();
+        // if(this.currentLevel > 1){
+        //     if(timeOfDay.dayTimeTicks < BACKGROUND_TIME_MORNING) {
+        //         if(this.currentLevel == 3)
+        //              ctx.drawImage(ASSET_MANAGER.getAsset(BACKGROUND_ASSET_MORNING), 0, 0, 896, 288 - 8, 0 - this.x, 0 - this.y, 896 * 2, (288 - 8) * 2 );
+        //         else if(this.currentLevel == 2)
+        //             ctx.drawImage(ASSET_MANAGER.getAsset(BACKGROUND_ASSET_MORNING), 0, 288, 1520, 576 - 8, 0 - this.x, 0 - this.y, 1520 * 2, (576 - 8) * 2 );
+        //         }
+        //     else if(timeOfDay.dayTimeTicks < BACKGROUND_TIME_AFTERNOON) {
+        //         if(this.currentLevel == 3)
+        //              ctx.drawImage(ASSET_MANAGER.getAsset(BACKGROUND_ASSET_AFTERNOON), 0, 0, 896, 288 - 8, 0 - this.x, 0 - this.y, 896 * 2, (288 - 8) * 2 );
+        //         else if(this.currentLevel == 2)
+        //             ctx.drawImage(ASSET_MANAGER.getAsset(BACKGROUND_ASSET_AFTERNOON), 0, 288, 1520, 576 - 8, 0 - this.x, 0 - this.y, 1520 * 2, (576 - 8) * 2 );
+        //         }
+        //     else if(timeOfDay.dayTimeTicks < BACKGROUND_TIME_SUNSET) {
+        //         if(this.currentLevel == 3)
+        //              ctx.drawImage(ASSET_MANAGER.getAsset(BACKGROUND_ASSET_SUNSET), 0, 0, 896, 288 - 8, 0 - this.x, 0 - this.y, 896 * 2, (288 - 8) * 2 );
+        //         else if(this.currentLevel == 2)
+        //             ctx.drawImage(ASSET_MANAGER.getAsset(BACKGROUND_ASSET_SUNSET), 0, 288, 1520, 576 - 8, 0 - this.x, 0 - this.y, 1520 * 2, (576 - 8) * 2 );
+        //         }
+        //     else {
+        //         if(this.currentLevel == 3)
+        //              ctx.drawImage(ASSET_MANAGER.getAsset(BACKGROUND_ASSET_NIGHT), 0, 0, 896, 288 - 8, 0 - this.x, 0 - this.y, 896 * 2, (288 - 8) * 2 );
+        //         else if(this.currentLevel == 2)
+        //             ctx.drawImage(ASSET_MANAGER.getAsset(BACKGROUND_ASSET_NIGHT), 0, 288, 1520, 576 - 8, 0 - this.x, 0 - this.y, 1520 * 2, (576 - 8) * 2 );
+        //         }
 
-        // --- background ---
-        const timeOfDay = engine.getClock();
-        if(this.currentLevel > 1){
-            if(timeOfDay.dayTimeTicks < BACKGROUND_TIME_MORNING) {
-                if(this.currentLevel == 3)
-                     ctx.drawImage(ASSET_MANAGER.getAsset(BACKGROUND_ASSET_MORNING), 0, 0, 896, 288 - 8, 0 - this.x, 0 - this.y, 896 * 2, (288 - 8) * 2 );
-                else if(this.currentLevel == 2)
-                    ctx.drawImage(ASSET_MANAGER.getAsset(BACKGROUND_ASSET_MORNING), 0, 288, 1520, 576 - 8, 0 - this.x, 0 - this.y, 1520 * 2, (576 - 8) * 2 );
-                }
-            else if(timeOfDay.dayTimeTicks < BACKGROUND_TIME_AFTERNOON) {
-                if(this.currentLevel == 3)
-                     ctx.drawImage(ASSET_MANAGER.getAsset(BACKGROUND_ASSET_AFTERNOON), 0, 0, 896, 288 - 8, 0 - this.x, 0 - this.y, 896 * 2, (288 - 8) * 2 );
-                else if(this.currentLevel == 2)
-                    ctx.drawImage(ASSET_MANAGER.getAsset(BACKGROUND_ASSET_AFTERNOON), 0, 288, 1520, 576 - 8, 0 - this.x, 0 - this.y, 1520 * 2, (576 - 8) * 2 );
-                }
-            else if(timeOfDay.dayTimeTicks < BACKGROUND_TIME_SUNSET) {
-                if(this.currentLevel == 3)
-                     ctx.drawImage(ASSET_MANAGER.getAsset(BACKGROUND_ASSET_SUNSET), 0, 0, 896, 288 - 8, 0 - this.x, 0 - this.y, 896 * 2, (288 - 8) * 2 );
-                else if(this.currentLevel == 2)
-                    ctx.drawImage(ASSET_MANAGER.getAsset(BACKGROUND_ASSET_SUNSET), 0, 288, 1520, 576 - 8, 0 - this.x, 0 - this.y, 1520 * 2, (576 - 8) * 2 );
-                }
-            else {
-                if(this.currentLevel == 3)
-                     ctx.drawImage(ASSET_MANAGER.getAsset(BACKGROUND_ASSET_NIGHT), 0, 0, 896, 288 - 8, 0 - this.x, 0 - this.y, 896 * 2, (288 - 8) * 2 );
-                else if(this.currentLevel == 2)
-                    ctx.drawImage(ASSET_MANAGER.getAsset(BACKGROUND_ASSET_NIGHT), 0, 288, 1520, 576 - 8, 0 - this.x, 0 - this.y, 1520 * 2, (576 - 8) * 2 );
-                }
+        //     }
 
-            }
-
-        if(this.currentLevel == 3)
-            ctx.drawImage(ASSET_MANAGER.getAsset("/Assets/WorldTiles/Backgrounds.png"), 0, 0, 896, 288 - 8, 0 - this.x, 0 - this.y, 896 * 2, (288 - 8) * 2 );
-        else if(this.currentLevel == 2)
-            ctx.drawImage(ASSET_MANAGER.getAsset("/Assets/WorldTiles/Backgrounds.png"), 0, 287, 1520, 576 - 8, 0 - this.x, 0 - this.y, 1520 * 2, (576 - 8) * 2 );
+        // if(this.currentLevel == 3)
+        //     ctx.drawImage(ASSET_MANAGER.getAsset("/Assets/WorldTiles/Backgrounds.png"), 0, 0, 896, 288 - 8, 0 - this.x, 0 - this.y, 896 * 2, (288 - 8) * 2 );
+        // else if(this.currentLevel == 2)
+        //     ctx.drawImage(ASSET_MANAGER.getAsset("/Assets/WorldTiles/Backgrounds.png"), 0, 287, 1520, 576 - 8, 0 - this.x, 0 - this.y, 1520 * 2, (576 - 8) * 2 );
 
 
         // --- draw tiles ---
@@ -852,7 +944,18 @@ export default class LevelManager {
                                 ctx.drawImage(asset, 54, 54, 16, 16, column * TILE_SIZE - this.x + 16, row * TILE_SIZE - this.y + 16, TILE_SIZE/2 + 1, TILE_SIZE/2 + 1 )
                             }
                         }
-                }
+                    } //else if (tile >= 10 && tile < 15) {
+                    //     const sprite = ASSET_MANAGER.getAsset(tileTextures[5]);
+                    //     if (tile == 10) {
+                    //         ctx.drawImage(sprite, 0, 0, 32, 48, column*TILE_SIZE - this.x, row*TILE_SIZE-this.y - (24*4) + 5, 32*4, 48*4)
+                    //     }
+                    //     if (tile == 11) {
+                    //         ctx.drawImage(sprite, 32, 0, 32, 48, column*TILE_SIZE - this.x, row*TILE_SIZE-this.y - (24*4) + 5, 32*4, 48*4)
+                    //     }
+                    //     if (tile == 12) {
+                    //         ctx.drawImage(sprite, 128, 0, 32, 48, column*TILE_SIZE - this.x, row*TILE_SIZE-this.y - (24*4) + 5, 32*4, 48*4)
+                    //     }
+                    // }
                 else {
                     ctx.fillStyle = tileColors[tile];
                     ctx.fillRect(column * TILE_SIZE - this.x, row * TILE_SIZE - this.y, TILE_SIZE + 1, TILE_SIZE + 1);
@@ -860,5 +963,77 @@ export default class LevelManager {
                 }
             }
         }
+    }
+}
+
+export class BackgroundManager {
+    constructor(engine) {
+        this.engine = engine;
+    }
+
+    update(engine) {
+        // this.x = engine.camera.x;
+        // this.y = engine.camera.y
+    }
+    draw(ctx, engine) {
+        // --- camera ---
+        const level = engine.getLevel();
+        if(!level.data[0]) return;
+        
+        const worldCenterX = level.player.x + level.player.width / 2 - CAMERA_CENTER_X
+        const worldCenterY = level.player.y + level.player.height / 2 - CAMERA_CENTER_Y
+        const levelWidth = (level.data[0].length - 16) * CONSTANTS.TILESIZE
+        const levelHeight = (level.data.length - 12) * CONSTANTS.TILESIZE
+
+        // scroll right
+        if(level.x < worldCenterX - HORIZONTAL_FORGIVENESS) {
+            level.x = Math.min(worldCenterX - HORIZONTAL_FORGIVENESS, levelWidth)
+        }
+        // scroll left
+        if(level.x > worldCenterX + HORIZONTAL_FORGIVENESS) {
+            level.x = Math.max(worldCenterX + HORIZONTAL_FORGIVENESS, 0)
+        }
+        // scroll down
+        if(level.y < worldCenterY - VERTICAL_FORGIVENESS) {
+            level.y = Math.min(worldCenterY - VERTICAL_FORGIVENESS, levelHeight)
+        }
+        // scroll up
+        if(level.y > worldCenterY + VERTICAL_FORGIVENESS) {
+            level.y = Math.max(worldCenterY + VERTICAL_FORGIVENESS, 0)
+        }
+        // --- background ---
+        const timeOfDay = engine.getClock();
+        if(level.currentLevel > 1){
+            if(timeOfDay.dayTimeTicks < BACKGROUND_TIME_MORNING) {
+                if(level.currentLevel == 3)
+                     ctx.drawImage(ASSET_MANAGER.getAsset(BACKGROUND_ASSET_MORNING), 0, 0, 896, 288 - 8, 0 - level.x, 0 - level.y, 896 * 2, (288 - 8) * 2 );
+                else if(level.currentLevel == 2)
+                    ctx.drawImage(ASSET_MANAGER.getAsset(BACKGROUND_ASSET_MORNING), 0, 288, 1520, 576 - 8, 0 - level.x, 0 - level.y, 1520 * 2, (576 - 8) * 2 );
+                }
+            else if(timeOfDay.dayTimeTicks < BACKGROUND_TIME_AFTERNOON) {
+                if(level.currentLevel == 3)
+                     ctx.drawImage(ASSET_MANAGER.getAsset(BACKGROUND_ASSET_AFTERNOON), 0, 0, 896, 288 - 8, 0 - level.x, 0 - level.y, 896 * 2, (288 - 8) * 2 );
+                else if(level.currentLevel == 2)
+                    ctx.drawImage(ASSET_MANAGER.getAsset(BACKGROUND_ASSET_AFTERNOON), 0, 288, 1520, 576 - 8, 0 - level.x, 0 - level.y, 1520 * 2, (576 - 8) * 2 );
+                }
+            else if(timeOfDay.dayTimeTicks < BACKGROUND_TIME_SUNSET) {
+                if(level.currentLevel == 3)
+                     ctx.drawImage(ASSET_MANAGER.getAsset(BACKGROUND_ASSET_SUNSET), 0, 0, 896, 288 - 8, 0 - level.x, 0 - level.y, 896 * 2, (288 - 8) * 2 );
+                else if(level.currentLevel == 2)
+                    ctx.drawImage(ASSET_MANAGER.getAsset(BACKGROUND_ASSET_SUNSET), 0, 288, 1520, 576 - 8, 0 - level.x, 0 - level.y, 1520 * 2, (576 - 8) * 2 );
+                }
+            else {
+                if(level.currentLevel == 3)
+                     ctx.drawImage(ASSET_MANAGER.getAsset(BACKGROUND_ASSET_NIGHT), 0, 0, 896, 288 - 8, 0 - level.x, 0 - level.y, 896 * 2, (288 - 8) * 2 );
+                else if(level.currentLevel == 2)
+                    ctx.drawImage(ASSET_MANAGER.getAsset(BACKGROUND_ASSET_NIGHT), 0, 288, 1520, 576 - 8, 0 - level.x, 0 - level.y, 1520 * 2, (576 - 8) * 2 );
+                }
+
+            }
+
+        if(level.currentLevel == 3)
+            ctx.drawImage(ASSET_MANAGER.getAsset("/Assets/WorldTiles/Backgrounds.png"), 0, 0, 896, 288 - 8, 0 - level.x, 0 - level.y, 896 * 2, (288 - 8) * 2 );
+        else if(level.currentLevel == 2)
+            ctx.drawImage(ASSET_MANAGER.getAsset("/Assets/WorldTiles/Backgrounds.png"), 0, 287, 1520, 576 - 8, 0 - level.x, 0 - level.y, 1520 * 2, (576 - 8) * 2 );
     }
 }

@@ -7,7 +7,7 @@ import { CONSTANTS, secondsToTicks } from '/js/Util.js';
 
 const HITBOX_WIDTH = 16;
 const HITBOX_HEIGHT = 16;
-const PICKUP_COOLDOWN = secondsToTicks(1); // the item can't be picked up for this amount of time;
+const PICKUP_COOLDOWN = secondsToTicks(0.5); // the item can't be picked up for this amount of time;
 const DRAG = 1;
 const GRAVITY = 1;
 

@@ -64,7 +64,8 @@ export default class Customer extends EntityInteractable {
         this.completeBubbleSprite = new Animator(ASSET_MANAGER.getAsset("/Assets/Icons/CompleteOrder.png"), 0, 0, 32, 34, 1, 1, 0);
 
         // sprite dish
-        this.dishSprite = new Animator(ASSET_MANAGER.getAsset(getItemData(this.recipeItemID).assetName), 0, 0, getItemData(this.recipeItemID).width, getItemData(this.recipeItemID).height, 1, 1, 0);
+        const assetData = getItemData(this.recipeItemID);
+        this.dishSprite = new Animator(ASSET_MANAGER.getAsset(assetData.assetName), assetData.spriteX, assetData.spriteY, getItemData(this.recipeItemID).width, getItemData(this.recipeItemID).height, 1, 1, 0);
 
         this.customerFrame = Math.floor(Math.random() * 6);
         this.customerSprite = new Animator(ASSET_MANAGER.getAsset("/Assets/Entities/Customers.png"), 0, 0, 32, 32, 1, 1, 0, false, false);

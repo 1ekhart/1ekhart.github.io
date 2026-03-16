@@ -63,7 +63,7 @@ export default class RecipeButton { // like button but with some added features
 
         this.iconScale = iconScale * 3 / Math.max(4, this.ingredientIcons.length)
 
-        this.dishSprite = new Animator(ASSET_MANAGER.getAsset(this.recipeItemData.assetName), 0, 0, this.recipeItemData.width, this.recipeItemData.height, 1, 1, 0);
+        this.dishSprite = new Animator(ASSET_MANAGER.getAsset(this.recipeItemData.assetName), this.recipeItemData.spriteX, this.recipeItemData.spriteY, this.recipeItemData.width, this.recipeItemData.height, 1, 1, 0);
     }
 
     setVisible() {

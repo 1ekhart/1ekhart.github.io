@@ -153,6 +153,89 @@ const FriedPumpkin = {
     assetName: "/Assets/Icons/FriedPumpkin.png"
 }
 
+const SugarCane = {
+    itemID: 14,
+    name: "Sugar Cane",
+    width: 32,
+    height: 32,
+    spriteX: 0,
+    spriteY: 0,
+    scale: 1,
+    sellPrice: 30,
+    assetName: "/Assets/Icons/SugarCaneIcon.png"
+}
+
+const Strawberry = {
+    itemID: 15,
+    name: "Strawberry",
+    width: 32,
+    height: 32,
+    spriteX: 0,
+    spriteY: 0,
+    scale: 1,
+    sellPrice: 40,
+    assetName: "/Assets/Icons/Strawberry.png"
+}
+
+const StrawberryCake = {
+    itemID: 16,
+    name: "Cake",
+    width: 32,
+    height: 32,
+    spriteX: 0,
+    spriteY: 0,
+    scale: 1,
+    sellPrice: 80,
+    assetName: "/Assets/Icons/StrawberryTreats-Sheet.png"
+}
+
+const StrawberryPie = {
+    itemID: 17,
+    name: "Pie",
+    width: 32,
+    height: 32,
+    spriteX: 0,
+    spriteY: 32,
+    scale: 1,
+    sellPrice: 80,
+    assetName: "/Assets/Icons/StrawberryTreats-Sheet.png"
+}
+
+const DragonMeat = {
+    itemID: 18,
+    name: "Dragon Meat",
+    width: 32,
+    height: 32,
+    spriteX: 0,
+    spriteY: 0,
+    scale: 1,
+    sellPrice: 200,
+    assetName: "/Assets/Icons/DragonMeat.png"
+}
+
+const Onion = {
+    itemID: 19,
+    name: "Onion",
+    width: 32,
+    height: 32,
+    spriteX: 0,
+    spriteY: 0,
+    scale: 1,
+    sellPrice: 20,
+    assetName: "/Assets/Icons/Onion.png"
+}
+
+const OnionRing = {
+    itemID: 20,
+    name: "Onion Rings",
+    width: 32,
+    height: 32,
+    spriteX: 0,
+    spriteY: 0,
+    scale: 1,
+    sellPrice: 20,
+    assetName: "/Assets/Icons/OnionRing.png"
+}
 
 const itemList = {
     1: Coin,
@@ -168,11 +251,18 @@ const itemList = {
     11: Croquettes,
     12: Pumpkin,
     13: FriedPumpkin,
+    14: SugarCane,
+    15: Strawberry,
+    16: StrawberryCake,
+    17: StrawberryPie,
+    18: DragonMeat,
+    19: Onion,
+    20: OnionRing
 }
 
-const grains = [Rice, Flour]
-const vegetables = [Cabbage, Potato, Pumpkin]
-const meats = [BoarMeat]
+const grains = [Rice, Flour, SugarCane]
+const vegetables = [Cabbage, Potato, Pumpkin, Onion, Strawberry]
+const meats = [BoarMeat, DragonMeat]
 
 const itemListNames = {
     Pot: Pot,
