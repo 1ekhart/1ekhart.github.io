@@ -286,6 +286,7 @@ export default class LevelManager {
             that.menu = false;
             discardMenuUI();
             this.engine.setClock(new InGameClock(this.engine));
+            this.engine.getClock().resumeTime();
             const inventoryUI = new InventoryUI(this.player, ctx);
             // that.engine.inventoryUI = inventoryUI;
             that.engine.addUIEntity(inventoryUI);
