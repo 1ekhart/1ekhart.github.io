@@ -144,7 +144,7 @@ export default class InGameClock extends Entity {
             } else if (!this.isCookingMode && this.dayTimeTicks >= MODE_SWITCH_HOUR * HOUR_LENGTH) { // handle switching to cooking mode
                 this.handleModeSwitch(engine);
                 this.isDisplayingWarning = false;
-            } else if (this.dayCount <= 1 && !this.isDisplayingWarning && (this.dayTimeTicks >= (MODE_SWITCH_HOUR - 1) * HOUR_LENGTH)) { // give a warning when close to mode switch
+            } else if (this.dayCount <= 1 && !this.isDisplayingWarning && (this.dayTimeTicks == (MODE_SWITCH_HOUR - 1) * HOUR_LENGTH)) { // give a warning when close to mode switch
                 console.log("It's almost time to open up shop! Gather as much ingredients before the time runs out!")
                 this.isDisplayingWarning = true;
                 engine.addUIEntity(new DialogueBox(engine, "It's almost time to open up shop! Gather as much ingredients before the time runs out!"));
